@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Utility\Input.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\Timer.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Matrix4x4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector2.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\DXDevice.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\Mesh.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\Shader.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\State.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\MathHelpers.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Camera.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\RenderGlobals.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Entity.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Messenger.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\RenderMethod.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\Texture.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\CBuffer.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\EntityManager.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Boat.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\Assimp.cpp">
+      <Filter>Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\SceneGlobals.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Missile.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Utility\ColourTypes.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Input.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Timer.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix4x4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\MathHelpers.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\DXDevice.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\Mesh.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\Shader.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\State.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Camera.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\RenderGlobals.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Entity.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Messenger.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\RenderMethod.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\Texture.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\MeshTypes.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\CBuffer.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\EntityManager.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Boat.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\TextureTypes.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\CBufferTypes.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\Assimp.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\Utility.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SceneGlobals.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\EntityTypes.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Missile.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{3b75a466-1b3f-44db-90a2-73a9bfc56583}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{739716ac-bd96-4e4c-b3a2-61c7fdfdea4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render">
+      <UniqueIdentifier>{81e3d2fa-5129-4c0d-8748-37189b0f5019}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\Shaders">
+      <UniqueIdentifier>{1d198607-cf52-46a9-8994-554d241d97a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{69d0e963-d473-4931-8f55-cd71e15187ff}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Render\Shaders\ps_blinn-1_tex-d.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Render\Shaders\vs_pnuv_p2c_pn2w_uv.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Render\Shaders\vs_pntuv_p2c_pnt2w_uv.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Render\Shaders\ps_pbr1-1p.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Render\Shaders\ps_blinn-1n_tex-dn.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Render\Shaders\ps_blinn-1p_tex-dnh.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Render\Shaders\ps_colour-only.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Render\Shaders\ps_tex-only.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Render\Shaders\vs_p_p2c.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Render\Shaders\vs_pn_p2c_pn2w.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Render\Shaders\vs_puv_p2c_uv.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Render\Shaders\ps_blinn-1.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Render\Shaders\ps_pbr1-1n.hlsl">
+      <Filter>Render\Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Render\Shaders\Common.hlsli">
+      <Filter>Render\Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>
