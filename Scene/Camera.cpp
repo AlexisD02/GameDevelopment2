@@ -150,3 +150,67 @@ Vector2 Camera::PixelSizeInWorldSpace(float Z, unsigned int viewportWidth, unsig
 	// Return world size of single pixel at given Z distance
 	return { viewportSizeAtZ.x / viewportWidth, viewportSizeAtZ.y / viewportHeight };
 }
+
+// Return a ray (start + direction) in world space that goes from the camera,
+// through the 2D pixel given by (pixelX, pixelY).
+void Camera::GetPickRay(float pixelX, float pixelY, unsigned int viewportWidth, unsigned int viewportHeight, Vector3& outRayStart, Vector3& outRayDir)
+{
+	UpdateMatrices();
+
+	// Convert pixel (x,y) to Normalized Device Coordinates (NDC) in [-1..1]
+	float ndcX = ((pixelX / static_cast<float>(viewportWidth)) * 2.0f) - 1.0f;
+	float ndcY = 1.0f - ((pixelY / static_cast<float>(viewportHeight)) * 2.0f);
+	// Typically, 0 at the top means you invert Y to get the correct range.
+
+	// Create two points in clip space: one at the near plane (z=0 in [0..1]) and one at the far plane (z=1).
+	Vector4 nearClip = { ndcX, ndcY, 0.0f, 1.0f };
+	Vector4 farClip = { ndcX, ndcY, 1.0f, 1.0f };
+
+	// Transform these two points by the inverse of the ViewProjection matrix
+	Matrix4x4 invViewProj = InverseAffine(mViewProjectionMatrix);
+
+	// Transform nearClip to world space
+	Vector4 nearWorld = nearClip * invViewProj;
+
+	nearWorld.x /= nearWorld.w;
+	nearWorld.y /= nearWorld.w;
+	nearWorld.z /= nearWorld.w;
+	nearWorld.w = 1.0f;
+
+	// Transform farClip to world space
+	Vector4 farWorld = farClip * invViewProj;
+	farWorld.x /= farWorld.w;
+	farWorld.y /= farWorld.w;
+	farWorld.z /= farWorld.w;
+	farWorld.w = 1.0f;
+
+	// The ray starts at the nearWorld point.
+	outRayStart = Vector3( nearWorld.x, nearWorld.y, nearWorld.z );
+	outRayDir = Normalise(Vector3( farWorld.x - nearWorld.x, farWorld.y - nearWorld.y, farWorld.z - nearWorld.z ));
+}
+
+// Projects a screen-space pixel to a world-space position on a predefined plane.
+bool Camera::WorldPtFromPixel(float pixelX, float pixelY, unsigned int viewportWidth, unsigned int viewportHeight, Vector3& outWorldPos)
+{
+	Vector3 rayStart, rayDir;
+	GetPickRay(pixelX, pixelY, viewportWidth, viewportHeight, rayStart, rayDir);
+
+	const float planeY = -1.5f;
+	float denom = rayDir.y;
+	if (std::fabs(denom) < 1e-6f)
+	{
+		return false; // Ray is nearly parallel to the plane
+	}
+
+	float t = (planeY - rayStart.y) / denom;
+
+	if (t < 0.0f)
+	{
+		return false; // Intersection is behind the camera
+	}
+
+	outWorldPos = rayStart + rayDir * t;
+	outWorldPos.y = planeY;
+
+	return true;
+}

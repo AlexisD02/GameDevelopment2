@@ -59,7 +59,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.;Scene;Render;Math;Utility;External\DirectXTK;External\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>External\tinyxml2;XML;External\imgui\backends;.;Scene;Render;Math;Utility;External\DirectXTK;External\assimp\include;External\imgui</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -92,6 +92,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="External\imgui\backends\imgui_impl_dx11.cpp" />
+    <ClCompile Include="External\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="External\imgui\imgui.cpp" />
+    <ClCompile Include="External\imgui\imgui_demo.cpp" />
+    <ClCompile Include="External\imgui\imgui_draw.cpp" />
+    <ClCompile Include="External\imgui\imgui_tables.cpp" />
+    <ClCompile Include="External\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="External\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Math\MathHelpers.cpp" />
     <ClCompile Include="Math\Matrix4x4.cpp" />
@@ -113,12 +121,20 @@
     <ClCompile Include="Scene\EntityManager.cpp" />
     <ClCompile Include="Scene\Messenger.cpp" />
     <ClCompile Include="Scene\Missile.cpp" />
+    <ClCompile Include="Scene\RandomCrate.cpp" />
     <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="Scene\SceneGlobals.cpp" />
+    <ClCompile Include="Scene\SeaMine.cpp" />
+    <ClCompile Include="Scene\Shield.cpp" />
     <ClCompile Include="Utility\Input.cpp" />
     <ClCompile Include="Utility\Timer.cpp" />
+    <ClCompile Include="XML\ParseLevel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="External\imgui\backends\imgui_impl_dx11.h" />
+    <ClInclude Include="External\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="External\imgui\imgui.h" />
+    <ClInclude Include="External\tinyxml2\tinyxml2.h" />
     <ClInclude Include="Math\Vector4.h" />
     <ClInclude Include="Math\Matrix4x4.h" />
     <ClInclude Include="Math\Vector2.h" />
@@ -143,12 +159,18 @@
     <ClInclude Include="Scene\EntityTypes.h" />
     <ClInclude Include="Scene\Messenger.h" />
     <ClInclude Include="Scene\Missile.h" />
+    <ClInclude Include="Scene\Obstacle.h" />
+    <ClInclude Include="Scene\RandomCrate.h" />
+    <ClInclude Include="Scene\ReloadStation.h" />
     <ClInclude Include="Scene\Scene.h" />
     <ClInclude Include="Scene\SceneGlobals.h" />
+    <ClInclude Include="Scene\SeaMine.h" />
+    <ClInclude Include="Scene\Shield.h" />
     <ClInclude Include="Utility\ColourTypes.h" />
     <ClInclude Include="Utility\Input.h" />
     <ClInclude Include="Utility\Timer.h" />
     <ClInclude Include="Utility\Utility.h" />
+    <ClInclude Include="XML\ParseLevel.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Render\Shaders\ps_blinn-1.hlsl">
@@ -232,6 +254,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Render\Shaders\Common.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Entities.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

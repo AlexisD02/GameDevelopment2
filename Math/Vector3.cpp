@@ -141,6 +141,21 @@ template <typename T> Vector3T<T> Normalise(const Vector3T<T>& v)
     }
 }
 
+// Performs linear interpolation between two values.
+template<typename T> Vector3T<T> Lerp(const Vector3T<T>& a, const Vector3T<T>& b, float t)
+{
+    return a + (b - a) * t;
+}
+
+// Returns a normalized vector from the given offset if the distance is above a small threshold.
+template<typename T> Vector3T<T> OffsetNorm(const Vector3T<T>& offset, float dist)
+{
+    if (dist < 0.0001f)
+    {
+        return { 0, 0, 0 };
+    }
+    return offset / dist;
+}
 
 
 /*-----------------------------------------------------------------------------------------
@@ -162,6 +177,8 @@ template Vector3 operator/ (const Vector3& v, float s);
 template float   Dot  (const Vector3& v1, const Vector3& v2);
 template Vector3 Cross(const Vector3& v1, const Vector3& v2);
 template Vector3 Normalise(const Vector3& v);
+template Vector3 Lerp(const Vector3& a, const Vector3& b, float t);
+template Vector3 OffsetNorm(const Vector3& offset, float dist);
 
 template Vector3d operator+ (const Vector3d& v, const Vector3d& w);
 template Vector3d operator- (const Vector3d& v, const Vector3d& w);
@@ -171,6 +188,8 @@ template Vector3d operator/ (const Vector3d& v, double s);
 template double   Dot  (const Vector3d& v1, const Vector3d& v2);
 template Vector3d Cross(const Vector3d& v1, const Vector3d& v2);
 template Vector3d Normalise(const Vector3d& v);
+template Vector3d Lerp(const Vector3d& a, const Vector3d& b, float t);
+template Vector3d OffsetNorm(const Vector3d& offset, float dist);
 
 template Vector3i operator+ (const Vector3i& v, const Vector3i& w);
 template Vector3i operator- (const Vector3i& v, const Vector3i& w);

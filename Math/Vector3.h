@@ -127,5 +127,8 @@ template <typename T> Vector3T<T> Cross(const Vector3T<T>& v1, const Vector3T<T>
 // Return unit length vector in the same direction as given one
 template <typename T> Vector3T<T> Normalise(const Vector3T<T>& v);
 
+template <typename T> Vector3T<T> Lerp(const Vector3T<T>& a, const Vector3T<T>& b, float t);
+
+template <typename T> Vector3T<T> OffsetNorm(const Vector3T<T>& offset, float dist);
 
 #endif // _VECTOR3_H_DEFINED_

@@ -7,6 +7,7 @@
 #define _INPUT_H_DEFINED_
 
 #include "Vector2.h"
+#include <windows.h>
 
 /*-----------------------------------------------------------------------------------------
     Constants
@@ -185,6 +186,7 @@ void KeyUpEvent(KeyCode Key);
 // Event called to indicate that the mouse has been moved
 void MouseMoveEvent(int X, int Y);
 
+void MouseGetEvent(int X, int Y);
 
 /*-----------------------------------------------------------------------------------------
     Input functions
@@ -208,5 +210,8 @@ bool AnyKeyHeld();
 // Returns current position of mouse as a Vector2i
 Vector2i GetMouse();
 
+Vector2i GetRawMouse();
+
+Vector2i GetMousePosition(HWND hWnd);
 
 #endif // _INPUT_H_DEFINED_

@@ -17,6 +17,8 @@ std::array<KeyState, NumKeyCodes> gKeyStates;
 // Current position of mouse
 Vector2i gMousePosition = {0, 0};
 
+Vector2i gRawMousePosition = { 0, 0 };
+
 
 
 /*-----------------------------------------------------------------------------------------
@@ -58,6 +60,11 @@ void KeyUpEvent(KeyCode Key)
 void MouseMoveEvent(int X, int Y)
 {
     gMousePosition += { X, Y };
+}
+
+void MouseGetEvent(int X, int Y)
+{
+    gRawMousePosition = { X, Y };
 }
 
 
@@ -128,4 +135,21 @@ bool AnyKeyHeld()
 Vector2i GetMouse()
 {
     return gMousePosition;
+}
+
+Vector2i GetRawMouse()
+{
+    return gRawMousePosition;
+}
+
+Vector2i GetMousePosition(HWND hWnd)
+{
+    POINT pt;
+    if (GetCursorPos(&pt))
+    {
+        // Convert screen coordinates to client coordinates
+        ScreenToClient(hWnd, &pt);
+        return Vector2i(pt.x, pt.y);
+    }
+    return Vector2i(0, 0);
 }

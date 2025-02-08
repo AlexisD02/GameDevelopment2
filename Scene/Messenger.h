@@ -27,6 +27,14 @@ enum class MessageType
 	TargetPoint,  // Set target to a given point     - carries TargetPointData payload
 	TargetNone,   // Set no target                   - no data payload
 	Die,          // Destroy entity or component     - no data payload
+	Start,
+	Stop,
+	Hit,
+	Evade,
+	Help,
+	Reload,
+	MineHit,
+	CrateCollected
 };
 
 
@@ -47,13 +55,30 @@ struct TargetPointData
 	float   range;
 };
 
+enum class CrateType
+{
+	Missile,
+	Health,
+	Shield
+};
+
+struct CratePickupData
+{
+	CrateType type;
+};
+
+struct MissileHitData
+{
+	EntityID launchingBoatID;
+};
+
+// Then modify the MessageData type:
 // Different types of messages carry different payloads of data. We could do this with polymorphism, but messaging must be
 // efficient and polymorphism carries some overheads (this overhead is often not a problem but could be in a messaging heavy game). 
 // Instead we use std::variant (C++17), which is a type that can be one from a collection of alternatives.
 // The type MessageData below can be one of TargetEntityData, TargetPointData or empty (indicated by std::monostate)
 //*** These are examples, if you add new message data structures, add them to this collection
-using MessageData = std::variant<std::monostate, TargetEntityData, TargetPointData>;
-
+using MessageData = std::variant<std::monostate, TargetEntityData, TargetPointData, CratePickupData, MissileHitData>;
 
 // Message structure as returned from ReceiveMessage function: contains the sender, message type and optionally some kind of data payload
 //*** Do not change this structure

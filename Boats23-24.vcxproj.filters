@@ -74,6 +74,42 @@
     <ClCompile Include="Scene\Missile.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="External\imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\backends\imgui_impl_dx11.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\imgui\backends\imgui_impl_win32.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="XML\ParseLevel.cpp">
+      <Filter>XML\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="External\tinyxml2\tinyxml2.cpp">
+      <Filter>XML\tinyxml2</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\RandomCrate.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\SeaMine.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene\Shield.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utility\ColourTypes.h">
@@ -166,6 +202,36 @@
     <ClInclude Include="Scene\Missile.h">
       <Filter>Scene</Filter>
     </ClInclude>
+    <ClInclude Include="External\imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui\backends\imgui_impl_dx11.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui\backends\imgui_impl_win32.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="XML\ParseLevel.h">
+      <Filter>XML\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\ReloadStation.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="External\tinyxml2\tinyxml2.h">
+      <Filter>XML\tinyxml2</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Obstacle.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\RandomCrate.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SeaMine.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Shield.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utility">
@@ -182,6 +248,18 @@
     </Filter>
     <Filter Include="Scene">
       <UniqueIdentifier>{69d0e963-d473-4931-8f55-cd71e15187ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{1e918ee3-0c81-40a4-82c0-92535caeaf88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XML">
+      <UniqueIdentifier>{9ab764dc-7a31-4337-bc16-a149cee0f346}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XML\tinyxml2">
+      <UniqueIdentifier>{382801aa-fc3b-4a4c-b98c-f94e6ada21ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XML\Data">
+      <UniqueIdentifier>{7da9d2c7-aa98-4880-85d4-02a19854fec1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -229,5 +307,8 @@
     <None Include="Render\Shaders\Common.hlsli">
       <Filter>Render\Shaders</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Entities.xml" />
   </ItemGroup>
 </Project>

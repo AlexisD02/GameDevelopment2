@@ -11,6 +11,10 @@
 #define _ENTITY_MANAGER_H_INCLUDED_
 
 #include "Entity.h"
+#include "Boat.h"
+#include "ReloadStation.h"
+#include "Obstacle.h"
+#include "RandomCrate.h"
 
 #include <string>
 #include <map>
@@ -196,6 +200,118 @@ public:
 		}
 
 		return entity;
+	}
+
+	template <typename T>
+	void CreateCollection(std::vector<T*>& collection)
+	{
+		for (auto& entityTemplate : mEntityTemplates)
+		{
+			try
+			{
+				T* matchingTemplate = dynamic_cast<T*>(entityTemplate.second.get());
+				if (matchingTemplate == nullptr)  continue;
+				collection.push_back(matchingTemplate);
+			}
+			catch (std::bad_cast e) {}
+		}
+	}
+
+	std::vector<Entity*> GetAllEntities()
+	{
+		std::vector<Entity*> allEntities;
+		allEntities.reserve(mEntities.size());
+
+		for (auto& [id, entityPtr] : mEntities)
+		{
+			if (dynamic_cast<Entity*>(entityPtr.get()))
+			{
+				allEntities.emplace_back(entityPtr.get());
+			}
+		}
+
+		return allEntities;
+	}
+
+	std::vector<Obstacle*> GetAllObstacleEntities()
+	{
+		std::vector<Obstacle*> allObstacleEntities;
+		allObstacleEntities.reserve(mEntities.size());
+
+		for (auto& [id, entityObstaclePtr] : mEntities)
+		{
+			if (dynamic_cast<Obstacle*>(entityObstaclePtr.get()))
+			{
+				allObstacleEntities.emplace_back(static_cast<Obstacle*>(entityObstaclePtr.get()));
+			}
+		}
+
+		return allObstacleEntities;
+	}
+
+	std::vector<Boat*> GetAllBoatEntities(EntityID excludeID = NO_ID)
+	{
+		std::vector<Boat*> allBoatEntities;
+		allBoatEntities.reserve(mEntities.size());
+
+		for (const auto& [id, entityBoatPtr] : mEntities)
+		{
+			// Use dynamic_cast to check if the entity is a Boat
+			if (dynamic_cast<Boat*>(entityBoatPtr.get()) && id != excludeID)
+			{
+				allBoatEntities.emplace_back(static_cast<Boat*>(entityBoatPtr.get()));
+			}
+		}
+
+		return allBoatEntities;
+	}
+
+	std::vector<EntityID> GetAllBoatIDS(EntityID excludeID = NO_ID)
+	{
+		std::vector<EntityID> allBoatIDS;
+
+		for (const auto& [id, entityBoatPtr] : mEntities)
+		{
+			// Use dynamic_cast to check if the entity is a Boat
+			if (dynamic_cast<Boat*>(entityBoatPtr.get()) && id != excludeID)
+			{
+				allBoatIDS.emplace_back(id);
+			}
+		}
+
+		return allBoatIDS;
+	}
+
+	std::vector<ReloadStation*> GetAllReloadStationEntities()
+	{
+		std::vector<ReloadStation*> allReloadStationEntities;
+		allReloadStationEntities.reserve(mEntities.size());
+
+		for (const auto& [id, entityPtr] : mEntities)
+		{
+			if (dynamic_cast<ReloadStation*>(entityPtr.get()))
+			{
+				allReloadStationEntities.emplace_back(static_cast<ReloadStation*>(entityPtr.get()));
+			}
+		}
+
+		return allReloadStationEntities;
+	}
+
+	std::vector<RandomCrate*> GetAllCratesEntities()
+	{
+		std::vector<RandomCrate*> allCratesEntities;
+		allCratesEntities.reserve(mEntities.size());
+
+		for (const auto& [id, entityPtr] : mEntities)
+		{
+			if (dynamic_cast<RandomCrate*>(entityPtr.get()))
+			{
+				allCratesEntities.emplace_back(static_cast<RandomCrate*>(entityPtr.get()));
+			}
+		}
+
+		return allCratesEntities;
 	}
 
 

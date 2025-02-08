@@ -46,8 +46,18 @@
 #define _BOAT_H_INCLUDED_
 
 #include "Entity.h"
+#include "EntityTypes.h"
+#include "RandomCrate.h"
 #include "Vector3.h"
+#include "Matrix4x4.h"
 
+struct AABB;
+
+enum class Team
+{
+    TeamA,
+    TeamB
+};
 
 /*-----------------------------------------------------------------------------------------
 	Boat Entity Template Class
@@ -64,12 +74,14 @@ public:
 	// Entity template constructor parameters must begin with parameters: type amd meshFilename, used to construct the base class.
 	// Further parameters are allowed if required - here several parameters to intialise base stats for this kind of boat
 	// Must include importFlags as last parameter regardless
-	BoatTemplate(const std::string& type, const std::string& meshFilename,
-		         float maxSpeed, float acceleration, float turnSpeed, float gunTurnSpeed,
-		         float maxHP, float missileDamage, ImportFlags importFlags = {})
-		: EntityTemplate(type, meshFilename, importFlags),
-		  mMaxSpeed(maxSpeed), mAcceleration(acceleration), mTurnSpeed(turnSpeed), mGunTurnSpeed(gunTurnSpeed),
-		  mMaxHP(maxHP), mMissileDamage(missileDamage) {} // No construction code, just call base class constructor and copy over all the stats to member variables
+    BoatTemplate(const std::string& type, const std::string& meshFilename,
+        float maxSpeed, float acceleration, float turnSpeed, float gunTurnSpeed,
+        float maxHP, float missileDamage, Team team, ImportFlags importFlags = {})
+        : EntityTemplate(type, meshFilename, importFlags),
+        mMaxSpeed(maxSpeed), mAcceleration(acceleration), mTurnSpeed(turnSpeed),
+        mGunTurnSpeed(gunTurnSpeed), mMaxHP(maxHP), mMissileDamage(missileDamage),
+        mTeam(team)
+    {}
 
 
 	/*-----------------------------------------------------------------------------------------
@@ -78,12 +90,13 @@ public:
 private:
 	// Statistics common to all boats of this type
 	// There are no getters in this class, but the Boat class is a friend, so boats can access all of these variables directly, e.g. Template()->mMaxSpeed
-	float mMaxSpeed;
-	float mAcceleration;
-	float mTurnSpeed;
-	float mGunTurnSpeed;
-	float mMaxHP;
-	float mMissileDamage;
+    float mMaxSpeed;
+    float mAcceleration;
+    float mTurnSpeed;
+    float mGunTurnSpeed;
+    float mMaxHP;
+    float mMissileDamage;
+    Team mTeam;
 };
 
 
@@ -101,48 +114,86 @@ public:
 	// Further parameters are allowed if required. Here we set an initial speed for the new boat.
 	// Since the base class also has optional transform and name parameters you should also add those two parameters at the end
 	// at the end also even though not strictly required
-	Boat(EntityTemplate& entityTemplate, EntityID ID, float initSpeed, 
-		 const Matrix4x4& transform = Matrix4x4::Identity, const std::string& name = "")
-		: Entity(entityTemplate, ID, transform, name)
-	{
-		auto& boatTemplate = static_cast<BoatTemplate&>(entityTemplate);
-		mHP = boatTemplate.mMaxHP;
+    Boat(EntityTemplate& entityTemplate, EntityID ID, float initSpeed,
+        const Matrix4x4& transform, const std::string& name = "")
+        : Entity(entityTemplate, ID, transform, name),
+        mBoatTemplate(static_cast<BoatTemplate&>(entityTemplate)),
+        mTeam(mBoatTemplate.mTeam)
+    {
+        mHP = mBoatTemplate.mMaxHP;
+        mSpeed = initSpeed;
+        if (mSpeed > mBoatTemplate.mMaxSpeed)  mSpeed = mBoatTemplate.mMaxSpeed;
 
-		mSpeed = initSpeed;
-		if (mSpeed > boatTemplate.mMaxSpeed)  mSpeed = boatTemplate.mMaxSpeed;
+        mDoubleSpeed = initSpeed * 2;
+        mState = State::Inactive;
+        mTimer = 0.0f;
+        mMissileDamage = mBoatTemplate.mMissileDamage;
+        mMissilesRemaining = 10;
+        mReloading = false;
+    }
 
-		mState = State::Bounce;
-		mTimer = 0;
-	}
 
-
-	/*-----------------------------------------------------------------------------------------
-	   Getters
-	-----------------------------------------------------------------------------------------*/
+    /*-----------------------------------------------------------------------------------------
+       Getters
+    -----------------------------------------------------------------------------------------*/
 public:
-	float GetSpeed()
-	{
-		return mSpeed;
-	}
+    int GetMissilesFired() { return mMissilesFired; }
+    float GetHP() { return mHP; }
+    float GetSpeed() { return mSpeed; }
+    float GetDoubleSpeed() { return mDoubleSpeed; }
+    float GetMissileDamage() { return mMissileDamage; }
+    Team GetTeam() { return mTeam; }
+    std::string GetState()
+    {
+        switch (mState)
+        {
+        case State::Inactive: return "Inactive";
+        case State::Patrol:   return "Patrol";
+        case State::Aim:      return "Aim";
+        case State::Evade:    return "Evade";
+        case State::Reloading:    return "Reloading";
+        case State::Destroyed:    return "Destroyed";
+        case State::TargetPoint:    return "TargetPoint";
+        case State::PickupCrate:    return "PickupCrate";
+        case State::Wiggle:    return "MineHit";
+        }
+        return "?";
+    }
 
-	std::string GetState()
-	{
-		switch (mState)
-		{
-		case State::Stop:    return "Stop";   break;
-		case State::Bounce:  return "Bounce"; break;
-		}
-		return "?";
-	}
+    // Setters
+    void SetTeam(Team team) { mTeam = team; }
+    void SetHP(float HP) { mHP = HP; }
+    void SetSpeed(float speed) { mSpeed = speed; }
 
+    // Missile operations
+    void UseMissile()
+    {
+        if (mMissilesRemaining > 0)
+        {
+            --mMissilesRemaining;
+            ++mMissilesFired;
+        }
+    }
+    int GetMissilesRemaining() const { return mMissilesRemaining; }
+    void ReloadMissiles() { mMissilesRemaining = 10; }
+    void AddMissiles(unsigned int missiles) { mMissilesRemaining += missiles; }
 
-	/*-----------------------------------------------------------------------------------------
-	   Update / Render
-	-----------------------------------------------------------------------------------------*/
+    void SetBoatText(const std::string& text)
+    {
+        mBoatText = text;
+        mBoatTextTimer = 3.0f;
+    }
+
+    const std::string& GetBoatText() const { return mBoatText; }
+    float GetBoatTextTimer() const { return mBoatTextTimer; }
+
+    /*-----------------------------------------------------------------------------------------
+       Update / Render
+    -----------------------------------------------------------------------------------------*/
 public:
-	// Update the entity including message processing for each entity. Virtual function - using polymorphism
-	// ***Entity Update functions should return false if the entity is to be destroyed***
-	virtual bool Update(float frameTime);
+    // Update the entity including message processing for each entity. Virtual function - using polymorphism
+    // ***Entity Update functions should return false if the entity is to be destroyed***
+    virtual bool Update(float frameTime);
 
 
 	/*-----------------------------------------------------------------------------------------
@@ -150,23 +201,74 @@ public:
 	-----------------------------------------------------------------------------------------*/
 private:
 	// States available for boats
-	enum class State
-	{
-		Stop,
-		Bounce,
-	};
+    enum class State
+    {
+        Inactive,
+        Patrol,
+        Aim,
+        Evade,
+        Reloading,
+        Destroyed,
+        TargetPoint,
+        PickupCrate,
+        Wiggle
+    };
+
+    // Helper functions for state behavior.
+    void UpdatePatrol(float frameTime);
+    void UpdateAim(float frameTime);
+    void UpdateEvade(float frameTime);
+    void UpdateReloading(float frameTime);
+    void UpdatePickupCrate(float frameTime);
+    void UpdateBoatTextTimer(float frameTime);
+    void UpdateWiggle(float frameTime);
+    void UpdateShieldAttachment(float frameTime);
+
+    // Internal helpers
+    Vector3 ChooseRandomPointInArea();
+    Vector3 ChooseEvadePoint(const Vector3& enemyPos);
+    void FaceDirection(const Vector3& dir, float dt, float turnSpeed);
+    EntityID CheckForEnemy(); // Return first boat ID seen
+    void BroadcastHelpMessage(Boat* enemyEntity);
+    void DestructionBehaviour(float frameTime, bool& shouldDestroy);
+    void HandleCollisionAvoidance(float frameTime);
+    RandomCrate* FindNearestCrate(float maxDistance);
+    bool IntersectLineAABB(const Vector3& start, const Vector3& end, const AABB& box);
+    bool IsLineOfSightBlocked(const Vector3& start, const Vector3& end);
+    void AttachShieldMesh();
 
 
-	/*-----------------------------------------------------------------------------------------
-	   Private data
-	-----------------------------------------------------------------------------------------*/
+    /*-----------------------------------------------------------------------------------------
+   Private data
+    -----------------------------------------------------------------------------------------*/
 private:
-	// Boat state
-	float mSpeed; // Current speed (in facing direction)
-	float mHP;    // Current hit points for the boat
+    // Boat state
+    BoatTemplate& mBoatTemplate; // Reference to the boat template
+    float mSpeed; // Current speed (in facing direction)
+    float mDoubleSpeed; // Speed multiplier
+    float mHP; // Current hit points for the boat
+    float mTimer; // General-purpose timer for updates
+    float mMissileDamage; // Damage dealt per missile
+    int mMissilesFired = 0; // Count of fired missiles
+    State mState; // Current state affecting behavior in Update function
+    Team mTeam; // Team affiliation of the boat
+    int mMissilesRemaining; // Number of missiles left
+    bool mReloading; // Flag indicating if the boat is reloading
+    float mWigglePhase = 0.0f; // Controls movement oscillation
+    float mLastWiggleAngle = 0.0f; // Stores last wiggle angle
 
-	State mState; // Current state - different states trigger different behaviour code in the Update function
-	float mTimer; // A timer used in the example Update function   
+    Vector3 mPatrolPoint; // Destination point for patrol behavior
+    Vector3 mEvadePoint; // Destination point for evasion
+    Vector3 mTargetPoint; // Current target position
+    float mTargetRange = 5.0f; // Distance within which the target is considered reached
+    std::string mBoatText; // Text displayed for the boat
+    float mBoatTextTimer = 0.0f; // Timer controlling boat text display
+
+    RandomCrate* mTargetCrate = nullptr; // Pointer to the crate being targeted
+    EntityID mShieldEntityID = NO_ID; // ID of the shield entity (if applicable)
+    float mShieldTimer = 0.0f; // Duration for which the shield remains active
+
+    EntityID mTargetBoat = NO_ID; // ID of the enemy boat being targeted
 };
 
 

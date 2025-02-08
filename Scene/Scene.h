@@ -6,6 +6,9 @@
 #ifndef _SCENE_H_INCLUDED_
 #define _SCENE_H_INCLUDED_
 
+#include "Boat.h"
+#include "ReloadStation.h"
+#include "Obstacle.h"
 #include "EntityTypes.h"
 #include "ColourTypes.h"
 
@@ -15,6 +18,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 // Forward declarations of various classes allows us to use pointers to those classes before those classes have been fully declared
 // This help us reduce the number of include files here, which in turn minimises dependencies and speeds up compilation
@@ -36,59 +40,89 @@ class Scene
 	// Construction
 	//--------------------------------------------------------------------------------------
 public:
-	// Constructs a demo scene ready to be rendered/updated
-	Scene();
+    // Constructs a demo scene ready to be rendered/updated
+    Scene();
 
 	// No destruction required but see comment on forward declarations above
-	~Scene(); 
+    ~Scene();
 
 
 	//--------------------------------------------------------------------------------------
 	// Usage
 	//--------------------------------------------------------------------------------------
 public:
-	// Render entire scene
-	void Render();
+    // Render entire scene
+    void Render();
 
-	// Update entire scene. frameTime is the time passed since the last frame
-	void Update(float frameTime);
+    // Update entire scene. frameTime is the time passed since the last frame
+    void Update(float frameTime);
 
 
-	//--------------------------------------------------------------------------------------
-	// Private helper functions
-	//--------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------
+    // Private helper functions
+    //--------------------------------------------------------------------------------------
 private:
-	// Render one viewpoint of the scene from the given camera, helper function for Scene::Render
-	void RenderFromCamera(Camera* camera);
+    // Render one viewpoint of the scene from the given camera, helper function for Scene::Render
+    void RenderFromCamera(Camera* camera);
 
-	// Draw given text at the given 3D point, also pass camera in use. Optionally centre align and colour the text
-	void DrawTextAtWorldPt(const Vector3& point, std::string text, Camera* camera, bool centreAlign = false, ColourRGB colour = { 1, 1, 1 });
+    // Draw given text at the given 3D point, also pass camera in use. Optionally centre align and colour the text
+    void DrawTextAtWorldPt(const Vector3& point, std::string text, Camera* camera, bool centreAlign = false, ColourRGB colour = { 1, 1, 1 });
 
+    // Handle camera picking and selection
+    void HandleMousePicking();
 
-	//--------------------------------------------------------------------------------------
-	// Private Data
-	//--------------------------------------------------------------------------------------
+    // Chase camera helpers
+    void UpdateChaseCameras(float frameTime);
+
+    void DrawGUI();
+
+    //--------------------------------------------------------------------------------------
+    // Private Data
+    //--------------------------------------------------------------------------------------
 private:
+    // Cameras
+    std::unique_ptr<Camera> mCamera; // User-controlled camera
+    std::vector<std::unique_ptr<Camera>> mChaseCameras; // Chase cameras for each boat
+    int mActiveCameraIndex = -1; // -1 indicates the main camera is active
 
-	std::unique_ptr<Camera> mCamera;
+    std::vector<BoatTemplate*> boatTemplates;
+    std::vector<Boat*> allBoats;
+    std::vector<EntityID> allBoatIDS;
 
-	// Entities in the demo scene
-	EntityID mLight = {};
-	EntityID mBoat1 = {};
-	EntityID mBoat2 = {};
-	EntityID mBoat3 = {};
+    // Entities in the demo scene
+    EntityID mLight = {};
 
-	// Additional light information
-	ColourRGB mAmbientColour = { 0, 0, 0 };
-	ID3D11ShaderResourceView* mEnvironmentMap = {};
+    // Additional light information
+    ColourRGB mAmbientColour = { 0, 0, 0 };
+    ColourRGB colour = ColourRGB(0xffffff);
 
-	// Lock FPS to monitor refresh rate, which will set it to 60/120/144/240fps
-	bool mLockFPS = true;
+    ID3D11ShaderResourceView* mEnvironmentMap = {};
 
-	// DirectXTK SpriteFont text drawing variables
-	std::unique_ptr<DirectX::DX11::SpriteBatch> mSpriteBatch;
-	std::unique_ptr<DirectX::DX11::SpriteFont>  mSmallFont;
-	std::unique_ptr<DirectX::DX11::SpriteFont>  mMediumFont;
+    // Lock FPS to monitor refresh rate, which will set it to 60/120/144/240fps
+    bool mLockFPS = true;
+    bool mGamePaused = false;
+    float mRandomCrateTimer = Random(3.0f, 6.0f);
+    float mRandomMineTimer = Random(5.0f, 8.0f);
+
+    // DirectXTK SpriteFont text drawing variables
+    std::unique_ptr<DirectX::DX11::SpriteBatch> mSpriteBatch;
+    std::unique_ptr<DirectX::DX11::SpriteFont>  mSmallFont;
+    std::unique_ptr<DirectX::DX11::SpriteFont>  mMediumFont;
+
+    bool mShowExtendedBoatUI = false;
+
+    // Variables for camera picking
+    Boat* mNearestEntity = nullptr;    // The entity closest to the mouse cursor
+    Boat* mSelectedBoat = nullptr;     // The currently selected boat
+    Boat* mSelectedUIBoat = nullptr;     // The currently selected boat
+    float PickDist = 100.0f;             // Distance to place the boat when moving
+
+    const float mChaseDistance = 40.0f;
+    const float mChaseHeight = 20.0f;
+    const float mChasePitch = ToRadians(15.0f);
+
+public:
+    void SetPauseState(bool pause) { mGamePaused = pause; }
 };
 
 
