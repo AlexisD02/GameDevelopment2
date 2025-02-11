@@ -298,5 +298,6 @@ template<typename T> Matrix4x4T<T> MatrixScaling(const T s);
 // Most commonly used to get the view matrix from the camera's positioning matrix
 template<typename T> Matrix4x4T<T> InverseAffine(const Matrix4x4T<T>& m);
 
+template<typename T> Matrix4x4T<T> Inverse(const Matrix4x4T<T>& m);
 
 #endif // _MATRIX4X4_H_DEFINED_

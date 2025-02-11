@@ -41,7 +41,7 @@ bool Missile::Update(float frameTime)
     // Check collision with each boat, excluding the launching boat
     for (Boat* boatPtr : allBoats)
     {
-        if (boatPtr->GetID() == mLaunchingBoatID) continue;
+        if (boatPtr->GetID() == mLaunchingBoatID || boatPtr->GetState() == "Destroyed") continue;
 
         Vector3 toBoat = boatPtr->Transform().Position() - newPos;
         float distSq = toBoat.x * toBoat.x + toBoat.y * toBoat.y + toBoat.z * toBoat.z;

@@ -17,18 +17,23 @@ public:
         mCrateType = crateType;
     }
 
+public:
     // The Update function is called every frame.
     virtual bool Update(float frameTime) override;
 
     CrateType GetCrateType() const { return mCrateType; }
 
-public:
     float collisionRadius = 15.0f;
 
 private:
     CrateType mCrateType;
     float mOscillationTime = 0.0f;
-    float mBaseY = -0.4f;
+    float mBaseY = -0.6f;
+
+    // Rising phase variables
+    float mRiseTimer = 0.0f;
+    float mRiseDuration = 2.0f;
+    float mStartY = -10.0f;
 };
 
 #endif // _RANDOM_CRATE_H_INCLUDED_

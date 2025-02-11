@@ -53,11 +53,14 @@
 
 struct AABB;
 
-enum class Team
+enum class Team : int 
 {
-    TeamA,
-    TeamB
+    TeamA = 0,
+    TeamB,
+    TeamC
 };
+
+inline const char* const teamNames[] = { "Team A", "Team B", "Team C" };
 
 /*-----------------------------------------------------------------------------------------
 	Boat Entity Template Class
@@ -124,7 +127,7 @@ public:
         mSpeed = initSpeed;
         if (mSpeed > mBoatTemplate.mMaxSpeed)  mSpeed = mBoatTemplate.mMaxSpeed;
 
-        mDoubleSpeed = initSpeed * 2;
+        mDoubleSpeed = mBoatTemplate.mMaxSpeed * 2;
         mState = State::Inactive;
         mTimer = 0.0f;
         mMissileDamage = mBoatTemplate.mMissileDamage;
@@ -155,9 +158,13 @@ public:
         case State::Destroyed:    return "Destroyed";
         case State::TargetPoint:    return "TargetPoint";
         case State::PickupCrate:    return "PickupCrate";
-        case State::Wiggle:    return "MineHit";
+        case State::Wiggle:    return "Wiggle";
         }
         return "?";
+    }
+
+    inline const char* GetTeamName() {
+        return teamNames[static_cast<int>(mTeam)];
     }
 
     // Setters
@@ -219,10 +226,10 @@ private:
     void UpdateAim(float frameTime);
     void UpdateEvade(float frameTime);
     void UpdateReloading(float frameTime);
+    void UpdateTargetPoint(float frameTime);
     void UpdatePickupCrate(float frameTime);
     void UpdateBoatTextTimer(float frameTime);
     void UpdateWiggle(float frameTime);
-    void UpdateShieldAttachment(float frameTime);
 
     // Internal helpers
     Vector3 ChooseRandomPointInArea();

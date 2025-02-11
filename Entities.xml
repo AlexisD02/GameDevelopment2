@@ -23,16 +23,16 @@
 		<EntityTemplate Type="EntityTemplate" Name="RandomCrate" Mesh="AmmoCrate.x" />
 		<EntityTemplate Type="EntityTemplate" Name="SeaMine" Mesh="sea mine.fbx" />
 		<EntityTemplate Type="EntityTemplate" Name="Shield" Mesh="shield_sphere.fbx" />
+		<EntityTemplate Type="EntityTemplate" Name="Pillar1" Mesh="Pillar.fbx" />
 
-		<!-- Boat Templates (Team A) -->
-		<EntityTemplate Type="BoatTemplate" Name="Blue Tanker" Mesh="Boat1.fbx" MaxSpeed="10.0" Acceleration="8.0" TurnSpeed="0.8" GunTurnSpeed="1.2" MaxHP="100.0" MissileDamage="25.0" Team="TeamA" />
-		<EntityTemplate Type="BoatTemplate" Name="Green Fleeter" Mesh="Boat1.fbx" MaxSpeed="12.0" Acceleration="4.0" TurnSpeed="1.0" GunTurnSpeed="1.0" MaxHP="80.0" MissileDamage="20.0" Team="TeamA" />
-		<EntityTemplate Type="BoatTemplate" Name="Purple Eater" Mesh="Boat1.fbx" MaxSpeed="15.0" Acceleration="6.0" TurnSpeed="1.0" GunTurnSpeed="0.8" MaxHP="90.0" MissileDamage="20.0" Team="TeamA" />
+		<!-- Boat Template (Team A) -->
+		<EntityTemplate Type="BoatTemplate" Name="Blue Tanker" Mesh="Boat1.fbx" MaxSpeed="6.5" Acceleration="1.0" TurnSpeed="0.9" GunTurnSpeed="1.1" MaxHP="100.0" MissileDamage="25.0" Team="TeamA" />
 
-		<!-- Boat Templates (Team B) -->
-		<EntityTemplate Type="BoatTemplate" Name="Xui Tanker" Mesh="Boat2.fbx" MaxSpeed="10.0" Acceleration="8.0" TurnSpeed="0.8" GunTurnSpeed="1.2" MaxHP="100.0" MissileDamage="25.0" Team="TeamB" />
-		<EntityTemplate Type="BoatTemplate" Name="Cago Fleeter" Mesh="Boat2.fbx" MaxSpeed="15.0" Acceleration="4.0" TurnSpeed="1.0" GunTurnSpeed="1.0" MaxHP="80.0" MissileDamage="20.0" Team="TeamB" />
-		<EntityTemplate Type="BoatTemplate" Name="Estriper Eater" Mesh="Boat2.fbx" MaxSpeed="12.0" Acceleration="6.0" TurnSpeed="1.0" GunTurnSpeed="0.8" MaxHP="90.0" MissileDamage="20.0" Team="TeamB" />
+		<!-- Boat Template (Team B) -->
+		<EntityTemplate Type="BoatTemplate" Name="Green Fleeter" Mesh="Boat2.fbx" MaxSpeed="7.0" Acceleration="1.0" TurnSpeed="0.9" GunTurnSpeed="1.2" MaxHP="100.0" MissileDamage="25.0" Team="TeamB" />
+
+		<!-- Boat Template (Team C) -->
+		<EntityTemplate Type="BoatTemplate" Name="Purple Eater" Mesh="Boat3.fbx" MaxSpeed="7.2" Acceleration="1.2" TurnSpeed="0.9" GunTurnSpeed="1.2" MaxHP="90.0" MissileDamage="15.0" Team="TeamC" />
 	</EntityTemplates>
 	<!-- End of Entity Types -->
 
@@ -54,90 +54,90 @@
 		<!-- Obstacles -->
 		<Entity Type="Obstacle" Template="Snow2">
 			<Transform>
-				<Position X="-550" Y="-5" Z="780" />
-				<Rotation Pitch="0" Yaw="-40" Roll="0" />
+				<Position X="-550" C="-5" Z="780" />
+				<Rotation X="0" Y="-40" Z="0" />
 			</Transform>
 			<Collision>
-				<HalfExtents X="100" Y="20" Z="100" />
+				<HalfExtents X="75" Y="20" Z="75" />
 			</Collision>
 		</Entity>
 		<Entity Type="Obstacle" Template="Snow1">
 			<Transform>
 				<Position X="-900" Y="0" Z="450" />
-				<Rotation Pitch="0" Yaw="-65" Roll="0" />
+				<Rotation X="0" Y="-65" Z="0" />
 			</Transform>
 			<Collision>
-				<HalfExtents X="100" Y="20" Z="100" />
+				<HalfExtents X="75" Y="20" Z="75" />
 			</Collision>
 		</Entity>
 		<Entity Type="Obstacle" Template="Snow2">
 			<Transform>
 				<Position X="-800" Y="0" Z="300" />
-				<Rotation Pitch="0" Yaw="-90" Roll="0" />
+				<Rotation X="0" Y="-90" Z="0" />
 			</Transform>
 			<Collision>
-				<HalfExtents X="100" Y="20" Z="100" />
+				<HalfExtents X="75" Y="20" Z="75" />
 			</Collision>
 		</Entity>
 		<Entity Type="Obstacle" Template="Snow4">
 			<Transform>
 				<Position X="-700" Y="0" Z="-300" />
-				<Rotation Pitch="0" Yaw="95" Roll="0" />
+				<Rotation X="0" Y="95" Z="0" />
 			</Transform>
 			<Collision>
-				<HalfExtents X="100" Y="20" Z="100" />
+				<HalfExtents X="75" Y="20" Z="75" />
 			</Collision>
 		</Entity>
 		<Entity Type="Obstacle" Template="Snow3">
 			<Transform>
 				<Position X="-400" Y="0" Z="-550" />
-				<Rotation Pitch="0" Yaw="80" Roll="0" />
+				<Rotation X="0" Y="80" Z="0" />
 			</Transform>
 			<Collision>
-				<HalfExtents X="100" Y="20" Z="100" />
+				<HalfExtents X="75" Y="20" Z="75" />
 			</Collision>
 		</Entity>
 		<Entity Type="Obstacle" Template="Snow5">
 			<Transform>
 				<Position X="250" Y="0" Z="860" />
-				<Rotation Pitch="0" Yaw="110" Roll="0" />
+				<Rotation X="0" Y="110" Z="0" />
 			</Transform>
 			<Collision>
-				<HalfExtents X="100" Y="20" Z="100" />
+				<HalfExtents X="75" Y="20" Z="75" />
 			</Collision>
 		</Entity>
 		<Entity Type="Obstacle" Template="Rock1">
 			<Transform>
 				<Position X="1200" Y="0" Z="200" />
-				<Rotation Pitch="0" Yaw="90" Roll="0" />
+				<Rotation X="0" Y="90" Z="0" />
 			</Transform>
 			<Collision>
-				<HalfExtents X="60" Y="20" Z="60" />
+				<HalfExtents X="75" Y="20" Z="75" />
 			</Collision>
 		</Entity>
 		<Entity Type="Obstacle" Template="Rock2">
 			<Transform>
 				<Position X="600" Y="0" Z="-700" />
-				<Rotation Pitch="0" Yaw="140" Roll="0" />
+				<Rotation X="0" Y="140" Z="0" />
 			</Transform>
 			<Collision>
-				<HalfExtents X="60" Y="20" Z="60" />
+				<HalfExtents X="75" Y="20" Z="75" />
 			</Collision>
 		</Entity>
 		<Entity Type="Obstacle" Template="Pillar">
 			<Transform>
 				<Position X="300" Y="0" Z="-700" />
-				<Rotation Pitch="0" Yaw="20" Roll="0" />
+				<Rotation X="0" Y="20" Z="0" />
 			</Transform>
 			<Collision>
-				<HalfExtents X="60" Y="20" Z="60" />
+				<HalfExtents X="75" Y="20" Z="75" />
 			</Collision>
 		</Entity>
 		<Entity Type="Obstacle" Template="Snow6">
 			<Transform>
 				<Position X="0" Y="0" Z="0" />
-				<Rotation Pitch="0" Yaw="20" Roll="0" />
-				<Scale Value="0.5" />
+				<Rotation X="0" Y="20" Z="0" />
+				<Scale Value="0.4" />
 			</Transform>
 			<Collision>
 				<HalfExtents X="65" Y="20" Z="65" />
@@ -146,21 +146,30 @@
 		<Entity Type="Obstacle" Template="Snow7">
 			<Transform>
 				<Position X="-50" Y="0" Z="-200" />
-				<Rotation Pitch="0" Yaw="20" Roll="0" />
-				<Scale Value="0.5" />
+				<Rotation X="0" Y="20" Z="0" />
+				<Scale Value="0.2" />
 			</Transform>
 			<Collision>
-				<HalfExtents X="60" Y="20" Z="60" />
+				<HalfExtents X="75" Y="20" Z="75" />
 			</Collision>
 		</Entity>
 		<Entity Type="Obstacle" Template="Snow8">
 			<Transform>
 				<Position X="300" Y="0" Z="0" />
-				<Rotation Pitch="0" Yaw="20" Roll="0" />
-				<Scale Value="0.5" />
+				<Rotation X="0" Y="20" Z="0" />
+				<Scale Value="0.4" />
 			</Transform>
 			<Collision>
 				<HalfExtents X="65" Y="20" Z="65" />
+			</Collision>
+		</Entity>
+		<Entity Type="Obstacle" Template="Pillar1">
+			<Transform>
+				<Position X="150" Y="0" Z="100" />
+				<Rotation X="0" Y="-20" Z="0" />
+			</Transform>
+			<Collision>
+				<HalfExtents X="75" Y="20" Z="75" />
 			</Collision>
 		</Entity>
 
@@ -168,75 +177,101 @@
 		<Entity Type="ReloadStation" Template="ReloadStation" Name="Reload Station 1">
 			<Transform>
 				<Position X="100" Y="0" Z="300" />
-				<Rotation Pitch="0" Yaw="20" Roll="0" />
+				<Rotation X="0" Y="20" Z="0" />
 				<Scale Value="2.0" />
 			</Transform>
 		</Entity>
 		<Entity Type="ReloadStation" Template="ReloadStation" Name="Reload Station 2">
 			<Transform>
 				<Position X="-100" Y="0" Z="-400" />
-				<Rotation Pitch="0" Yaw="70" Roll="0" />
+				<Rotation X="0" Y="70" Z="0" />
 				<Scale Value="2.0" />
 			</Transform>
 		</Entity>
 		<Entity Type="ReloadStation" Template="ReloadStation" Name="Reload Station 3">
 			<Transform>
 				<Position X="400" Y="0" Z="0" />
-				<Rotation Pitch="0" Yaw="90" Roll="0" />
+				<Rotation X="0" Y="90" Z="0" />
 				<Scale Value="2.0" />
 			</Transform>
 		</Entity>
 
 		<!-- Boat Entities (Team A) -->
-		<Entity Type="Boat" Template="Blue Tanker" Name="Blue Tanker">
+		<Entity Type="Boat" Template="Blue Tanker" Name="Tanker X">
 			<Transform>
-				<Position X="-50" Y="-1.5" Z="0" />
-				<Rotation Pitch="0" Yaw="0" Roll="0" />
+				<Position X="-100" Y="-1.5" Z="70" />
+				<Rotation X="0" Y="80" Z="0" />
 				<Scale Value="1.0" />
 			</Transform>
-			<Speed Value="5.0" />
+			<Speed Value="7.0" />
 		</Entity>
-		<Entity Type="Boat" Template="Green Fleeter" Name="Green Fleeter">
+		<Entity Type="Boat" Template="Blue Tanker" Name="Tanker Y">
 			<Transform>
-				<Position X="50" Y="-1.5" Z="0" />
-				<Rotation Pitch="0" Yaw="180" Roll="0" />
+				<Position X="-170" Y="-1.5" Z="0" />
+				<Rotation X="0" Y="90" Z="0" />
 				<Scale Value="1.0" />
 			</Transform>
-			<Speed Value="4.0" />
+			<Speed Value="7.0" />
 		</Entity>
-		<Entity Type="Boat" Template="Purple Eater" Name="Purple Eater">
+		<Entity Type="Boat" Template="Blue Tanker" Name="Tanker Z">
 			<Transform>
-				<Position X="0" Y="-1.5" Z="50" />
-				<Rotation Pitch="0" Yaw="90" Roll="0" />
+				<Position X="-100" Y="-1.5" Z="-70" />
+				<Rotation X="0" Y="100" Z="0" />
 				<Scale Value="1.0" />
 			</Transform>
-			<Speed Value="5.0" />
+			<Speed Value="7.0" />
 		</Entity>
-
+		
 		<!-- Boat Entities (Team B) -->
-		<Entity Type="Boat" Template="Xui Tanker" Name="Xui Tanker">
+		<Entity Type="Boat" Template="Green Fleeter" Name="Fleeter A">
 			<Transform>
 				<Position X="200" Y="-1.5" Z="0" />
-				<Rotation Pitch="0" Yaw="0" Roll="0" />
+				<Rotation X="0" Y="-80" Z="0" />
 				<Scale Value="1.0" />
 			</Transform>
-			<Speed Value="5.0" />
+			<Speed Value="7.0" />
 		</Entity>
-		<Entity Type="Boat" Template="Cago Fleeter" Name="Cago Fleeter">
+		<Entity Type="Boat" Template="Green Fleeter" Name="Fleeter C">
 			<Transform>
-				<Position X="250" Y="-1.5" Z="50" />
-				<Rotation Pitch="0" Yaw="0" Roll="0" />
+				<Position X="270" Y="-1.5" Z="70" />
+				<Rotation X="0" Y="-90" Z="0" />
 				<Scale Value="1.0" />
 			</Transform>
-			<Speed Value="4.0" />
+			<Speed Value="7.0" />
 		</Entity>
-		<Entity Type="Boat" Template="Estriper Eater" Name="Estriper Eater">
+		<Entity Type="Boat" Template="Green Fleeter" Name="Fleeter E">
 			<Transform>
-				<Position X="300" Y="-1.5" Z="-50" />
-				<Rotation Pitch="0" Yaw="0" Roll="0" />
+				<Position X="200" Y="-1.5" Z="-70" />
+				<Rotation X="0" Y="-100" Z="0" />
 				<Scale Value="1.0" />
 			</Transform>
-			<Speed Value="5.0" />
+			<Speed Value="7.0" />
+		</Entity>
+
+		<!-- Boat Entities (Team C) -->
+		<Entity Type="Boat" Template="Purple Eater" Name="Eater H">
+			<Transform>
+				<Position X="-70" Y="-1.5" Z="250" />
+				<Rotation X="0" Y="190" Z="0" />
+				<Scale Value="1.0" />
+			</Transform>
+			<Speed Value="7.0" />
+		</Entity>
+		<Entity Type="Boat" Template="Purple Eater" Name="Eater Q">
+			<Transform>
+				<Position X="0" Y="-1.5" Z="200" />
+				<Rotation X="0" Y="180" Z="0" />
+				<Scale Value="1.0" />
+			</Transform>
+			<Speed Value="7.0" />
+		</Entity>
+		<Entity Type="Boat" Template="Purple Eater" Name="Eater N">
+			<Transform>
+				<Position X="70" Y="-1.5" Z="250" />
+				<Rotation X="0" Y="170" Z="0" />
+				<Scale Value="1.0" />
+			</Transform>
+			<Speed Value="7.0" />
 		</Entity>
 
 	</Entities>

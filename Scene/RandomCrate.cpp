@@ -4,21 +4,34 @@
 
 bool RandomCrate::Update(float frameTime)
 {
-    mOscillationTime += frameTime;
-    Vector3 pos = Transform().Position();
+    // Handle rising phase
+    if (mRiseTimer < mRiseDuration)
+    {
+        mRiseTimer += frameTime;
+        float progress = mRiseTimer / mRiseDuration;
+        progress = std::min(progress, 1.0f); // Clamp to 1.0
 
-    pos.y = mBaseY + 1.0f * std::sin(mOscillationTime);
+        Vector3 minePos = Transform().Position();
+        minePos.y = mStartY + (mBaseY - mStartY) * progress;
+        Transform().Position() = minePos;
+    }
+    else // Start oscillating after rising
+    {
+        mOscillationTime += frameTime;
+        Vector3 cratePos = Transform().Position();
+        cratePos.y = mBaseY + 0.7f * std::sin(mOscillationTime);
+        Transform().Position() = cratePos;
+    }
 
-    // Update the crate's position.
-    Transform().Position() = pos;
 	Transform().RotateLocalY(0.75f * frameTime);
 
     std::vector<Boat*> boats = gEntityManager->GetAllBoatEntities();
     float collisionRadiusSq = collisionRadius * collisionRadius;
+    Vector3 cratePos = Transform().Position();
 
     for (Boat* boat : boats)
     {
-        Vector3 diff = boat->Transform().Position() - pos;
+        Vector3 diff = boat->Transform().Position() - cratePos;
         float distSq = diff.x * diff.x + diff.y * diff.y + diff.z * diff.z;
         if (distSq <= collisionRadiusSq)
         {

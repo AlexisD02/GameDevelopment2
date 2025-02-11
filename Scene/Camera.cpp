@@ -106,7 +106,7 @@ void Camera::UpdateMatrices()
 // coordinates in x and y and the Z-distance to the world point in z. If the Z-distance
 // is less than the camera near clip (use NearClip() member function), then the world
 // point is behind the camera and the 2D x and y coordinates are to be ignored.
-Vector3 Camera::PixelFromWorldPt(Vector3 worldPoint, unsigned int viewportWidth, unsigned int viewportHeight)
+Vector3 Camera::PixelFromWorldPt(Vector3 worldPoint, float viewportWidth, float viewportHeight)
 {
 	Vector3 pixelPoint;
 
@@ -135,7 +135,7 @@ Vector3 Camera::PixelFromWorldPt(Vector3 worldPoint, unsigned int viewportWidth,
 
 // Return the size of a pixel in world space at the given Z distance. Allows us to convert the 2D size of areas on the screen to actualy sizes in the world
 // Pass the viewport width and height
-Vector2 Camera::PixelSizeInWorldSpace(float Z, unsigned int viewportWidth, unsigned int viewportHeight)
+Vector2 Camera::PixelSizeInWorldSpace(float Z, float viewportWidth, float viewportHeight)
 {
 	Vector2 size;
 
@@ -153,32 +153,30 @@ Vector2 Camera::PixelSizeInWorldSpace(float Z, unsigned int viewportWidth, unsig
 
 // Return a ray (start + direction) in world space that goes from the camera,
 // through the 2D pixel given by (pixelX, pixelY).
-void Camera::GetPickRay(float pixelX, float pixelY, unsigned int viewportWidth, unsigned int viewportHeight, Vector3& outRayStart, Vector3& outRayDir)
+void Camera::GetPickRay(int pixelX, int pixelY, float viewportWidth, float viewportHeight, Vector3& outRayStart, Vector3& outRayDir)
 {
 	UpdateMatrices();
 
 	// Convert pixel (x,y) to Normalized Device Coordinates (NDC) in [-1..1]
-	float ndcX = ((pixelX / static_cast<float>(viewportWidth)) * 2.0f) - 1.0f;
-	float ndcY = 1.0f - ((pixelY / static_cast<float>(viewportHeight)) * 2.0f);
-	// Typically, 0 at the top means you invert Y to get the correct range.
-
-	// Create two points in clip space: one at the near plane (z=0 in [0..1]) and one at the far plane (z=1).
-	Vector4 nearClip = { ndcX, ndcY, 0.0f, 1.0f };
-	Vector4 farClip = { ndcX, ndcY, 1.0f, 1.0f };
+	float ndcX = ((2.0f * pixelX) / static_cast<float>(viewportWidth)) - 1.0f;
+	float ndcY = 1.0f - ((2.0f * pixelY) / static_cast<float>(viewportHeight));
 
 	// Transform these two points by the inverse of the ViewProjection matrix
-	Matrix4x4 invViewProj = InverseAffine(mViewProjectionMatrix);
+	Matrix4x4 invViewProj = Inverse(mViewProjectionMatrix);
 
-	// Transform nearClip to world space
+	// Create two points in clip space: one at the near plane (z=0 in [0..1]) and one at the far plane (z=1).
+	Vector4 nearClip = { ndcX, ndcY, -1.0f, 1.0f };
+	Vector4 farClip = { ndcX, ndcY, 1.0f, 1.0f };
+
+	// Transform nearClip and farClip to world space
 	Vector4 nearWorld = nearClip * invViewProj;
+	Vector4 farWorld = farClip * invViewProj;
 
 	nearWorld.x /= nearWorld.w;
 	nearWorld.y /= nearWorld.w;
 	nearWorld.z /= nearWorld.w;
 	nearWorld.w = 1.0f;
 
-	// Transform farClip to world space
-	Vector4 farWorld = farClip * invViewProj;
 	farWorld.x /= farWorld.w;
 	farWorld.y /= farWorld.w;
 	farWorld.z /= farWorld.w;
@@ -190,7 +188,7 @@ void Camera::GetPickRay(float pixelX, float pixelY, unsigned int viewportWidth, 
 }
 
 // Projects a screen-space pixel to a world-space position on a predefined plane.
-bool Camera::WorldPtFromPixel(float pixelX, float pixelY, unsigned int viewportWidth, unsigned int viewportHeight, Vector3& outWorldPos)
+bool Camera::WorldPtFromPixel(int pixelX, int pixelY, float viewportWidth, float viewportHeight, Vector3& outWorldPos)
 {
 	Vector3 rayStart, rayDir;
 	GetPickRay(pixelX, pixelY, viewportWidth, viewportHeight, rayStart, rayDir);

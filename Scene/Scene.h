@@ -9,6 +9,8 @@
 #include "Boat.h"
 #include "ReloadStation.h"
 #include "Obstacle.h"
+#include "SeaMine.h"
+#include "RandomCrate.h"
 #include "EntityTypes.h"
 #include "ColourTypes.h"
 
@@ -66,7 +68,7 @@ private:
     void RenderFromCamera(Camera* camera);
 
     // Draw given text at the given 3D point, also pass camera in use. Optionally centre align and colour the text
-    void DrawTextAtWorldPt(const Vector3& point, std::string text, Camera* camera, bool centreAlign = false, ColourRGB colour = { 1, 1, 1 });
+    void DrawTextAtWorldPt(const Vector3& point, std::string text, Camera* camera, bool centreAlign = false);
 
     // Handle camera picking and selection
     void HandleMousePicking();
@@ -88,6 +90,9 @@ private:
     std::vector<BoatTemplate*> boatTemplates;
     std::vector<Boat*> allBoats;
     std::vector<EntityID> allBoatIDS;
+    std::vector<ReloadStation*> reloadStations;
+    std::vector<RandomCrate*> existingCrates;
+    std::vector<SeaMine*> existingMines;
 
     // Entities in the demo scene
     EntityID mLight = {};
@@ -120,6 +125,9 @@ private:
     const float mChaseDistance = 40.0f;
     const float mChaseHeight = 20.0f;
     const float mChasePitch = ToRadians(15.0f);
+
+    const unsigned int mMaxCrates = 8;
+    const unsigned int mMaxMines = 10;
 
 public:
     void SetPauseState(bool pause) { mGamePaused = pause; }

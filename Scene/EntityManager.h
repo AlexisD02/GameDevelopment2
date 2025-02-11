@@ -15,6 +15,7 @@
 #include "ReloadStation.h"
 #include "Obstacle.h"
 #include "RandomCrate.h"
+#include "SeaMine.h"
 
 #include <string>
 #include <map>
@@ -312,6 +313,22 @@ public:
 		}
 
 		return allCratesEntities;
+	}
+
+	std::vector<SeaMine*> GetAllMinesEntities()
+	{
+		std::vector<SeaMine*> allSeaMinesEntities;
+		allSeaMinesEntities.reserve(mEntities.size());
+
+		for (const auto& [id, entityPtr] : mEntities)
+		{
+			if (dynamic_cast<SeaMine*>(entityPtr.get()))
+			{
+				allSeaMinesEntities.emplace_back(static_cast<SeaMine*>(entityPtr.get()));
+			}
+		}
+
+		return allSeaMinesEntities;
 	}
 
 

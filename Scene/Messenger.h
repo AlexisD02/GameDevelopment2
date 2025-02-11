@@ -34,7 +34,8 @@ enum class MessageType
 	Help,
 	Reload,
 	MineHit,
-	CrateCollected
+	CrateCollected,
+	ShieldDestroyed
 };
 
 

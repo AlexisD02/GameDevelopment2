@@ -18,8 +18,6 @@
 #include "CBufferTypes.h"
 #include "State.h"
 #include "RenderGlobals.h"
-#include "RandomCrate.h"
-#include "SeaMine.h"
 
 #include "Matrix4x4.h" 
 #include "Vector3.h" 
@@ -224,12 +222,18 @@ void Scene::Render()
             std::string state = boatPtr->GetState();
             int fired = boatPtr->GetMissilesFired();
             int missilesLeft = boatPtr->GetMissilesRemaining();
+            float speed = boatPtr->GetSpeed();
+
+            // Format speed with two decimal places
+            std::ostringstream speedStream;
+            speedStream << std::fixed << std::setprecision(2) << speed;
 
             text = boatPtr->GetName()
                 + " [HP=" + std::to_string((int)hp)
                 + ", State=" + state
                 + ", Fired=" + std::to_string(fired)
                 + ", Missiles=" + std::to_string(missilesLeft)
+                + ", Speed=" + speedStream.str()
                 + "]";
         }
         // Determine label color
@@ -237,12 +241,13 @@ void Scene::Render()
         else if (mNearestEntity && (boatPtr == mNearestEntity)) { colour = ColourRGB(0xff0000); } // Red for nearest entity
         else if (boatPtr->GetTeam() == Team::TeamA) { colour = ColourRGB(0x6060ff); } // Blue for team A
         else if (boatPtr->GetTeam() == Team::TeamB) { colour = ColourRGB(0x00ff00); } // Green for team B
+        else if (boatPtr->GetTeam() == Team::TeamC) { colour = ColourRGB(0x9932CC); } // Dark Orchid for team C
         else { colour = ColourRGB(0xffffff); }
 
         Vector3 boatPos = boatPtr->Transform().Position();
 
         // Draw the text label using activeCamera
-        DrawTextAtWorldPt(boatPos, text, activeCamera, true, colour);
+        DrawTextAtWorldPt(boatPos, text, activeCamera, true);
 
         if (!boatPtr->GetBoatText().empty())
         {
@@ -264,13 +269,13 @@ void Scene::Render()
 
             colour = ColourRGB(0xffcc00);
 
-            DrawTextAtWorldPt(pickupLabelPos, boatPtr->GetBoatText(), activeCamera, true, colour);
+            DrawTextAtWorldPt(pickupLabelPos, boatPtr->GetBoatText(), activeCamera, true);
         }
     }
 
     HandleMousePicking();
 
-    std::vector<ReloadStation*> reloadStations = gEntityManager->GetAllReloadStationEntities();
+    reloadStations = gEntityManager->GetAllReloadStationEntities();
     for (ReloadStation* reloadStation : reloadStations)
     {
         // Prepare the text label for the reload station
@@ -278,7 +283,9 @@ void Scene::Render()
 
         // Draw the text label above the reload station
         Vector3 labelPosition = reloadStation->Transform().Position() + Vector3(0, 10, 0);
-        DrawTextAtWorldPt(labelPosition, text, activeCamera, true, colour);
+        colour = ColourRGB(0xffffff);
+
+        DrawTextAtWorldPt(labelPosition, text, activeCamera, true);
     }
 
     mSpriteBatch->End();
@@ -331,7 +338,7 @@ void Scene::DrawGUI() {
     if (ImGui::CollapsingHeader("Boat Management")) {
         // Build a list of boat names and their IDs.
         std::vector<std::pair<std::string, EntityID>> boatData;
-        std::vector<EntityID> allBoatIDS = gEntityManager->GetAllBoatIDS();
+        allBoatIDS = gEntityManager->GetAllBoatIDS();
 
         // Populate boatData only with valid boat entities.
         for (EntityID boatID : allBoatIDS) {
@@ -413,15 +420,14 @@ void Scene::DrawGUI() {
                 mSelectedUIBoat->AddMissiles(setMissiles);
             }
 
-            std::string teamStr = (mSelectedUIBoat->GetTeam() == Team::TeamA) ? "Team A" : "Team B";
-            ImGui::Text("Team: %s", teamStr.c_str());
+            // Display the current team
+            ImGui::Text("Team: %s", mSelectedUIBoat->GetTeamName());
 
-            // Use a combo to allow changing the team.
-            static int teamIndex = (mSelectedUIBoat->GetTeam() == Team::TeamA) ? 0 : 1;
-            const char* teamOptions[] = { "Team A", "Team B" };
-            if (ImGui::Combo("Set Team", &teamIndex, teamOptions, IM_ARRAYSIZE(teamOptions))) {
-                Team newTeam = (teamIndex == 0) ? Team::TeamA : Team::TeamB;
-                mSelectedUIBoat->SetTeam(newTeam);
+            // Set up the combo box to allow changing the team.
+            int teamIndex = static_cast<int>(mSelectedUIBoat->GetTeam());
+            if (ImGui::Combo("Set Team", &teamIndex, teamNames, IM_ARRAYSIZE(teamNames))) {
+                // Update the boat's team.
+                mSelectedUIBoat->SetTeam(static_cast<Team>(teamIndex));
             }
 
             // Change Boat State buttons.
@@ -692,8 +698,10 @@ void Scene::Update(float frameTime)
         }
     }
 
-    if (mRandomCrateTimer <= 0.0f) {
-        Vector3 spawnPos(Random(-400, 400), -0.4f, Random(-400, 400));
+    // Check and spawn crates only if the current count is below the limit
+    existingCrates = gEntityManager->GetAllCratesEntities();
+    if (existingCrates.size() < mMaxCrates && mRandomCrateTimer <= 0.0f) {
+        Vector3 spawnPos(Random(-250.0f, 250.0f), -10.0f, Random(-250.0f, 250.0f));
         Matrix4x4 transform(spawnPos, { 0, 0, 0 }, 1.0f);
 
         float r = Random(0.0f, 1.0f);
@@ -706,13 +714,20 @@ void Scene::Update(float frameTime)
             type = CrateType::Shield;
 
         gEntityManager->CreateEntity<RandomCrate>("RandomCrate", transform, type);
-        mRandomCrateTimer = Random(2.0f, 5.0f);
+
+        // Reset the timer for the next crate spawn
+        mRandomCrateTimer = Random(12.0f, 20.0f);
     }
 
-    if (mRandomMineTimer <= 0.0f) {
-        Vector3 spawnPos(Random(-400, 400), -11.5f, Random(-400, 400));
+    // Check and spawn mines only if the current count is below the limit
+    existingMines = gEntityManager->GetAllMinesEntities();
+    if (existingMines.size() < mMaxMines && mRandomMineTimer <= 0.0f) {
+        Vector3 spawnPos(Random(-250.0f, 250.0f), -20.0f, Random(-250.0f, 250.0f));
         Matrix4x4 transform(spawnPos, { 0, 0, 0 }, 1.0f);
+
         gEntityManager->CreateEntity<SeaMine>("SeaMine", transform);
+
+        // Reset the timer for the next mine spawn
         mRandomMineTimer = Random(12.0f, 15.0f);
     }
 
@@ -729,9 +744,9 @@ void Scene::Update(float frameTime)
 // Draw Text at World Point
 //--------------------------------------------------------------------------------------
 // Draw given text at the given 3D point, also pass camera in use. Optionally centre align and colour the text
-void Scene::DrawTextAtWorldPt(const Vector3& point, std::string text, Camera* camera, bool centreAlign, ColourRGB colour)
+void Scene::DrawTextAtWorldPt(const Vector3& point, std::string text, Camera* camera, bool centreAlign)
 {
-    auto pixelPt = camera->PixelFromWorldPt(point, DX->GetBackbufferWidth(), DX->GetBackbufferHeight());
+    auto pixelPt = camera->PixelFromWorldPt(point, static_cast<float>(DX->GetBackbufferWidth()), static_cast<float>(DX->GetBackbufferHeight()));
     if (pixelPt.z >= camera->GetNearClip())
     {
         if (centreAlign)
@@ -763,7 +778,7 @@ void Scene::HandleMousePicking()
 
         // Use active camera for picking
         pixelPos3D = mCamera.get()->PixelFromWorldPt(boatPtr->Transform().Position(), gPerFrameConstants.viewportWidth, gPerFrameConstants.viewportHeight);
-        pixelPos = Vector2i(pixelPos3D.x, pixelPos3D.y);
+        pixelPos = Vector2i(static_cast<int>(pixelPos3D.x), static_cast<int>(pixelPos3D.y));
         mousePos = GetRawMouse();
         float distToBoat = (pixelPos - mousePos).Length();
 

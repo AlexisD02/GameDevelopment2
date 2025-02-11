@@ -73,15 +73,15 @@ public:
 	// coordinates in x and y and the Z distance to the world point in Z. If the Z distance
 	// is less than the camera near clip (use NearClip() member function), then the world
 	// point is behind the camera and the 2D x and y coordinates are to be ignored.
-	Vector3 PixelFromWorldPt(Vector3 worldPoint, unsigned int viewportWidth, unsigned int viewportHeight);
+	Vector3 PixelFromWorldPt(Vector3 worldPoint, float viewportWidth, float viewportHeight);
 
-	void GetPickRay(float pixelX, float pixelY, unsigned int viewportWidth, unsigned int viewportHeight, Vector3& outRayStart, Vector3& outRayDir);
+	void GetPickRay(int pixelX, int pixelY, float viewportWidth, float viewportHeight, Vector3& outRayStart, Vector3& outRayDir);
 
-	bool WorldPtFromPixel(float pixelX, float pixelY, unsigned int viewportWidth, unsigned int viewportHeight, Vector3& outWorldPos);
+	bool WorldPtFromPixel(int pixelX, int pixelY, float viewportWidth, float viewportHeight, Vector3& outWorldPos);
 
 	// Return the size of a pixel in world space at the given Z distance. Allows us to convert the 2D size of areas on the screen to actual sizes in the world
 	// Pass the viewport width and height
-	Vector2 PixelSizeInWorldSpace(float Z, unsigned int viewportWidth, unsigned int viewportHeight);
+	Vector2 PixelSizeInWorldSpace(float Z, float viewportWidth, float viewportHeight);
 
 
 	/*-----------------------------------------------------------------------------------------

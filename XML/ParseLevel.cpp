@@ -121,9 +121,17 @@ bool ParseLevel::ParseEntityTemplates(XMLElement* templatesElem)
             float missileDamage = attr->FloatValue();
 
             attr = templateElem->FindAttribute("Team");
-            if (attr == nullptr)  return false;
+            if (attr == nullptr)
+                return false;
             std::string teamStr = attr->Value();
-            Team teamEnum = (teamStr == "TeamA") ? Team::TeamA : Team::TeamB;
+
+            Team teamEnum = Team::TeamA;
+            if (teamStr == "TeamA")
+                teamEnum = Team::TeamA;
+            else if (teamStr == "TeamB")
+                teamEnum = Team::TeamB;
+            else if (teamStr == "TeamC")
+                teamEnum = Team::TeamC;
 
             mEntityManager->CreateEntityTemplate<BoatTemplate>(name, mesh, maxSpeed, acceleration, turnSpeed, gunTurnSpeed, maxHP, missileDamage, teamEnum);
         }
@@ -136,7 +144,7 @@ bool ParseLevel::ParseEntityTemplates(XMLElement* templatesElem)
 
 //------------------------------------------------------------------------------
 // Parse a list of entity tags, creating each entity when enough data has been read.
-// Ordinary entities (those not inside a <Team> tag) are parsed in this pass.
+// Ordinary entities are parsed in this pass.
 bool ParseLevel::ParseEntitiesElement(XMLElement* entitiesElem)
 {
     //--------------------

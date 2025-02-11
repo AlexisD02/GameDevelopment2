@@ -11,23 +11,18 @@ class Shield : public Entity
 {
 public:
     // Constructor: The entity template, unique ID, initial transform, duration of the shield, and optional name are passed in.
-    Shield(EntityTemplate& entityTemplate, EntityID id, const Matrix4x4& transform,
-        float duration = 7.0f, const std::string& name = "")
-        : Entity(entityTemplate, id, transform, name),
-        mDuration(duration),
-        mElapsed(0.0f)
-    {
-    }
+    Shield(EntityTemplate& entityTemplate, EntityID id, const Matrix4x4& transform, EntityID parentBoatID)
+        : Entity(entityTemplate, id, transform),
+        mParentBoatID(parentBoatID), mElapsed(0.0f), mShieldDuration(7.0f)
+    {}
 
     // Update function
     virtual bool Update(float frameTime) override;
 
-    // Accessor for duration if needed.
-    float GetDuration() const { return mDuration; }
-
 private:
-    float mDuration; // The duration the shield effect lasts
+    EntityID mParentBoatID; // The ID of the boat this shield is attached to
     float mElapsed;  // Time elapsed since the shield was spawned
+    float mShieldDuration;  // Duration before shield disappears
 };
 
 #endif // _SHIELD_H_INCLUDED_

@@ -15,13 +15,19 @@ public:
         : Entity(entityTemplate, id, transform)
     {}
 
+public:
     // Update is called every frame. Returns false when the mine should be destroyed.
     virtual bool Update(float frameTime) override;
 
 private:
     float mOscillationTime = 0.0f;
-    float mBaseY = -11.5f;
+    float mBaseY = -11.5f; // Target surface level
     float mExplosionRadius = 15.0f;
+
+    // Rising phase variables
+    float mRiseTimer = 0.0f;
+    float mRiseDuration = 2.0f; // Time to rise (seconds)
+    float mStartY = -20.0f; // Initial depth
 };
 
 #endif // _SEAMINE_H_INCLUDED_

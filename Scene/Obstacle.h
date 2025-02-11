@@ -29,9 +29,8 @@ public:
         mHalfExtents(halfExtents)
     {
         // Compute the AABB based on the transform's position.
-        Vector3 pos = transform.Position();
-        mAABB.min = pos - mHalfExtents;
-        mAABB.max = pos + mHalfExtents;
+        mAABB.min = Transform().Position() - mHalfExtents;
+        mAABB.max = Transform().Position() + mHalfExtents;
     }
 
     // Returns the obstacle's axis-aligned bounding box.

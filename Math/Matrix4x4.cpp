@@ -407,6 +407,54 @@ template<typename T> Matrix4x4T<T> InverseAffine(const Matrix4x4T<T>& m)
     return mOut;
 }
 
+// General matrix inverse function
+template<typename T> Matrix4x4T<T> Inverse(const Matrix4x4T<T>& m)
+{
+    Matrix4x4T<T> mOut;
+
+    T a00 = m.e00, a01 = m.e01, a02 = m.e02, a03 = m.e03;
+    T a10 = m.e10, a11 = m.e11, a12 = m.e12, a13 = m.e13;
+    T a20 = m.e20, a21 = m.e21, a22 = m.e22, a23 = m.e23;
+    T a30 = m.e30, a31 = m.e31, a32 = m.e32, a33 = m.e33;
+
+    T b00 = a00 * a11 - a01 * a10;
+    T b01 = a00 * a12 - a02 * a10;
+    T b02 = a00 * a13 - a03 * a10;
+    T b03 = a01 * a12 - a02 * a11;
+    T b04 = a01 * a13 - a03 * a11;
+    T b05 = a02 * a13 - a03 * a12;
+    T b06 = a20 * a31 - a21 * a30;
+    T b07 = a20 * a32 - a22 * a30;
+    T b08 = a20 * a33 - a23 * a30;
+    T b09 = a21 * a32 - a22 * a31;
+    T b10 = a21 * a33 - a23 * a31;
+    T b11 = a22 * a33 - a23 * a32;
+
+    T det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+
+    if (det == 0) return Matrix4x4T<T>(); // Identity if singular (handle error as needed)
+
+    T invDet = static_cast<T>(1) / det;
+
+    mOut.e00 = (a11 * b11 - a12 * b10 + a13 * b09) * invDet;
+    mOut.e01 = (a02 * b10 - a01 * b11 - a03 * b09) * invDet;
+    mOut.e02 = (a31 * b05 - a32 * b04 + a33 * b03) * invDet;
+    mOut.e03 = (a22 * b04 - a21 * b05 - a23 * b03) * invDet;
+    mOut.e10 = (a12 * b08 - a10 * b11 - a13 * b07) * invDet;
+    mOut.e11 = (a00 * b11 - a02 * b08 + a03 * b07) * invDet;
+    mOut.e12 = (a32 * b02 - a30 * b05 - a33 * b01) * invDet;
+    mOut.e13 = (a20 * b05 - a22 * b02 + a23 * b01) * invDet;
+    mOut.e20 = (a10 * b10 - a11 * b08 + a13 * b06) * invDet;
+    mOut.e21 = (a01 * b08 - a00 * b10 - a03 * b06) * invDet;
+    mOut.e22 = (a30 * b04 - a31 * b02 + a33 * b00) * invDet;
+    mOut.e23 = (a21 * b02 - a20 * b04 - a23 * b00) * invDet;
+    mOut.e30 = (a11 * b07 - a10 * b09 - a12 * b06) * invDet;
+    mOut.e31 = (a00 * b09 - a01 * b07 + a02 * b06) * invDet;
+    mOut.e32 = (a31 * b01 - a30 * b03 - a32 * b00) * invDet;
+    mOut.e33 = (a20 * b03 - a21 * b01 + a22 * b00) * invDet;
+
+    return mOut;
+}
 
 /*-----------------------------------------------------------------------------------------
     Template Instatiation
@@ -427,6 +475,7 @@ template Matrix4x4 MatrixRotationZ(float z);
 template Matrix4x4 MatrixScaling(const Vector3& s);
 template Matrix4x4 MatrixScaling(const float s);
 template Matrix4x4 InverseAffine(const Matrix4x4& m);
+template Matrix4x4 Inverse(const Matrix4x4& m);
 
 template Matrix4x4d operator*(const Matrix4x4d& m1, const Matrix4x4d& m2);
 template Vector4d   operator*(const Vector4d& v, const Matrix4x4d& m);
@@ -437,3 +486,4 @@ template Matrix4x4d MatrixRotationZ(double z);
 template Matrix4x4d MatrixScaling(const Vector3d& s);
 template Matrix4x4d MatrixScaling(const double s);
 template Matrix4x4d InverseAffine(const Matrix4x4d& m);
+template Matrix4x4d Inverse(const Matrix4x4d& m);
