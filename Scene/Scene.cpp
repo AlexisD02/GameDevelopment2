@@ -550,13 +550,14 @@ void Scene::RenderFromCamera(Camera* camera)
 void Scene::UpdateChaseCameras(float frameTime)
 {
     size_t cameraIndex = 0; // To track chase cameras corresponding to boats
+    std::vector<std::unique_ptr<Camera>> validCameras; // Store valid cameras
 
     // Associate each chase camera with its respective boat
     allBoats = gEntityManager->GetAllBoatEntities();
 
     for (Boat* boatPtr : allBoats)
     {
-        if (!boatPtr) continue;
+        if (!boatPtr || boatPtr->GetState() == "Destroyed") continue; // Skip destroyed boats
 
         // Ensure we have enough chase cameras for the boats
         if (cameraIndex >= mChaseCameras.size()) break;
@@ -569,6 +570,9 @@ void Scene::UpdateChaseCameras(float frameTime)
             continue;
         }
 
+        // Update valid cameras list
+        validCameras.emplace_back(std::move(mChaseCameras[cameraIndex]));
+
         // Get boat's position and forward direction
         Vector3 boatPos = boatPtr->Transform().Position();
         Vector3 boatForward = boatPtr->Transform().ZAxis();
@@ -578,7 +582,7 @@ void Scene::UpdateChaseCameras(float frameTime)
 
         // Smoothly interpolate camera position for smooth following
         Vector3 currentPos = chaseCam->Transform().Position();
-        float smoothSpeed = 5.0f; 
+        float smoothSpeed = 5.0f;
         Vector3 newPos = Lerp(currentPos, desiredPos, smoothSpeed * frameTime);
         chaseCam->Transform().Position() = newPos;
 
@@ -593,6 +597,20 @@ void Scene::UpdateChaseCameras(float frameTime)
 
         // Move to the next camera
         ++cameraIndex;
+    }
+
+    // Replace mChaseCameras with only valid cameras
+    mChaseCameras = std::move(validCameras);
+
+    // Ensure active camera index remains valid
+    if (mActiveCameraIndex >= static_cast<int>(mChaseCameras.size()))
+    {
+        mActiveCameraIndex = static_cast<int>(mChaseCameras.size()) - 1;
+    }
+
+    if (mChaseCameras.empty())
+    {
+        mActiveCameraIndex = -1; // No available chase cameras
     }
 }
 

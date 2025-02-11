@@ -159,6 +159,7 @@ public:
         case State::TargetPoint:    return "TargetPoint";
         case State::PickupCrate:    return "PickupCrate";
         case State::Wiggle:    return "Wiggle";
+        case State::MoveToAssist:    return "MoveToAssist";
         }
         return "?";
     }
@@ -218,7 +219,8 @@ private:
         Destroyed,
         TargetPoint,
         PickupCrate,
-        Wiggle
+        Wiggle,
+        MoveToAssist
     };
 
     // Helper functions for state behavior.
@@ -230,6 +232,7 @@ private:
     void UpdatePickupCrate(float frameTime);
     void UpdateBoatTextTimer(float frameTime);
     void UpdateWiggle(float frameTime);
+    void UpdateMoveToAssist(float frameTime);
 
     // Internal helpers
     Vector3 ChooseRandomPointInArea();
@@ -263,6 +266,7 @@ private:
     bool mReloading; // Flag indicating if the boat is reloading
     float mWigglePhase = 0.0f; // Controls movement oscillation
     float mLastWiggleAngle = 0.0f; // Stores last wiggle angle
+    float mSinkingAnimationTime = 4.0f;
 
     Vector3 mPatrolPoint; // Destination point for patrol behavior
     Vector3 mEvadePoint; // Destination point for evasion
@@ -274,6 +278,8 @@ private:
     RandomCrate* mTargetCrate = nullptr; // Pointer to the crate being targeted
     EntityID mShieldEntityID = NO_ID; // ID of the shield entity (if applicable)
     float mShieldTimer = 0.0f; // Duration for which the shield remains active
+
+    Boat* moveToEnemyBoat = nullptr;
 
     EntityID mTargetBoat = NO_ID; // ID of the enemy boat being targeted
 };

@@ -72,8 +72,10 @@ bool Boat::Update(float frameTime)
                 {
                     mState = State::Destroyed;
                 }
-
-                BroadcastHelpMessage(hitByBoat);
+                if (Random(0.0f, 1.0f) < 0.5f)
+                {
+                    BroadcastHelpMessage(hitByBoat);
+                }
             }
             else {
                 SetBoatText("0 Damage");
@@ -106,10 +108,16 @@ bool Boat::Update(float frameTime)
             break;
 
         case MessageType::Help:
-            if (Random(0.0f, 1.0f) < 0.5f && mState != State::Aim && mState != State::Destroyed)
-            {
-                mState = State::Aim;
-                mTimer = 2.0f;
+            if (mState != State::Aim && mState != State::Destroyed) {
+                HelpMessageData helpData = std::get<HelpMessageData>(message.data);
+                EntityID enemyBoatID = helpData.enemyBoatID;
+                moveToEnemyBoat = gEntityManager->GetEntity<Boat>(enemyBoatID);
+
+                if (moveToEnemyBoat)
+                {
+                    mState = State::MoveToAssist;
+                    mTimer = 2.0f;
+                }
             }
             break;
 
@@ -216,6 +224,10 @@ bool Boat::Update(float frameTime)
 
     case State::Wiggle:
         UpdateWiggle(frameTime);
+        break;
+
+    case State::MoveToAssist:
+        UpdateMoveToAssist(frameTime);
         break;
 
     case State::Destroyed:
@@ -537,13 +549,47 @@ void Boat::UpdateWiggle(float frameTime)
 }
 
 //------------------------------------------------------------------------------
+// Move towards the enemy boat that attacked a teammate.
+void Boat::UpdateMoveToAssist(float frameTime)
+{
+    if (!moveToEnemyBoat || moveToEnemyBoat->GetState() == "Destroyed")
+    {
+        mState = State::Patrol; // If the enemy boat is destroyed, revert to patrol
+        return;
+    }
+
+    Vector3 enemyPos = moveToEnemyBoat->Transform().Position();
+    Vector3 toEnemy = enemyPos - Transform().Position();
+    float distance = toEnemy.Length();
+
+    // If within engagement range, switch to Aim state
+    if (distance <= 120.0f)
+    {
+        mState = State::Aim;
+        mTimer = 2.0f;
+    }
+    else
+    {
+        // Move towards the enemy boat
+        float turnSpeed = std::min(mSpeed * 0.2f, mBoatTemplate.mTurnSpeed);
+        FaceDirection(toEnemy, frameTime, turnSpeed);
+
+        if (mSpeed < mBoatTemplate.mMaxSpeed)
+        {
+            mSpeed += mBoatTemplate.mAcceleration * frameTime;
+            if (mSpeed > mBoatTemplate.mMaxSpeed)
+                mSpeed = mBoatTemplate.mMaxSpeed;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
 // Destruction behavior: animate sinking before destruction.
 void Boat::DestructionBehaviour(float frameTime, bool& shouldDestroy)
 {
-    static float sinkingAnimationTime = 4.0f;
-    if (sinkingAnimationTime > 0.0f)
+    if (mSinkingAnimationTime > 0.0f)
     {
-        sinkingAnimationTime -= frameTime;
+        mSinkingAnimationTime -= frameTime;
         Transform().RotateLocalZ(frameTime * 0.3f);
         Transform().RotateLocalX(frameTime * 0.3f);
         Transform().MoveLocalY(-3.0f * frameTime);
@@ -552,7 +598,7 @@ void Boat::DestructionBehaviour(float frameTime, bool& shouldDestroy)
     else
     {
         shouldDestroy = true;
-        sinkingAnimationTime = 5.0f;
+        mSinkingAnimationTime = 4.0f;
     }
 }
 
@@ -870,12 +916,7 @@ void Boat::BroadcastHelpMessage(Boat* enemyEntity)
     if (!enemyEntity || enemyEntity->GetState() == "Destroyed") return;
 
     Vector3 enemyPos = enemyEntity->Transform().Position();
-    Vector3 myForward = Transform().ZAxis();
-    myForward.y = 0.0f;
-    myForward = Normalise(myForward);
-
-    static float kHelpDistance = 300.0f;
-    static float kMaxHelpAngle = 120.0f;
+    static float kHelpDistance = Random(100.0f, 300.0f);
 
     // Get all teammate boats (excluding self)
     std::vector<Boat*> teammates = gEntityManager->GetAllBoatEntities(GetID());
@@ -888,25 +929,11 @@ void Boat::BroadcastHelpMessage(Boat* enemyEntity)
         Vector3 toEnemy = enemyPos - matePos;
         float distanceToEnemy = toEnemy.Length();
 
-        // Ensure the teammate is within the help distance
         if (distanceToEnemy > kHelpDistance) continue;
 
-        // Normalize the vector towards the enemy
-        Vector3 toEnemyNorm = Normalise(toEnemy);
-        Vector3 mateForward = mate->Transform().ZAxis();
-        mateForward.y = 0.0f;
-        mateForward = Normalise(mateForward);
-
-        // Compute angle using dot product
-        float dotProduct = Dot(mateForward, toEnemyNorm);
-        dotProduct = std::clamp(dotProduct, -1.0f, 1.0f);
-        float angle = static_cast<float>(std::acos(dotProduct) * (180.0f / std::numbers::pi_v<float>));
-
-        // Ensure the teammate is facing the enemy (within angle limit)
-        if (angle > kMaxHelpAngle) continue;
-
-        // Send the help message if conditions are met
-        gMessenger->DeliverMessage(GetID(), mate->GetID(), MessageType::Help);
+        // Use the struct instead of raw EntityID
+        HelpMessageData helpData{ enemyEntity->GetID() };
+        gMessenger->DeliverMessage(GetID(), mate->GetID(), MessageType::Help, helpData);
     }
 }
 

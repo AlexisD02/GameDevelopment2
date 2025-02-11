@@ -73,13 +73,19 @@ struct MissileHitData
 	EntityID launchingBoatID;
 };
 
+struct HelpMessageData
+{
+	EntityID enemyBoatID; // The ID of the enemy boat that attacked
+};
+
+
 // Then modify the MessageData type:
 // Different types of messages carry different payloads of data. We could do this with polymorphism, but messaging must be
 // efficient and polymorphism carries some overheads (this overhead is often not a problem but could be in a messaging heavy game). 
 // Instead we use std::variant (C++17), which is a type that can be one from a collection of alternatives.
 // The type MessageData below can be one of TargetEntityData, TargetPointData or empty (indicated by std::monostate)
 //*** These are examples, if you add new message data structures, add them to this collection
-using MessageData = std::variant<std::monostate, TargetEntityData, TargetPointData, CratePickupData, MissileHitData>;
+using MessageData = std::variant<std::monostate, TargetEntityData, TargetPointData, CratePickupData, MissileHitData, HelpMessageData>;
 
 // Message structure as returned from ReceiveMessage function: contains the sender, message type and optionally some kind of data payload
 //*** Do not change this structure
