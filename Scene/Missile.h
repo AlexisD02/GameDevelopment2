@@ -19,33 +19,6 @@
 #include <string>
 
 /*-----------------------------------------------------------------------------------------
-    Missile Template Class
------------------------------------------------------------------------------------------*/
-class MissileTemplate : public EntityTemplate // Entity templates must inherit from EntityTemplate
-{
-    friend class Missile; // Allow Missile class access to private MissileTemplate data
-
-    /*-----------------------------------------------------------------------------------------
-       Constructor
-    -----------------------------------------------------------------------------------------*/
-public:
-    // Entity template constructor parameters must begin with: type and meshFilename.
-    MissileTemplate(const std::string& type, const std::string& meshFilename,
-        float speed, float damage, ImportFlags importFlags = {})
-        : EntityTemplate(type, meshFilename, importFlags),
-        mSpeed(speed), mDamage(damage) {}
-
-    /*-----------------------------------------------------------------------------------------
-       Private data
-    -----------------------------------------------------------------------------------------*/
-private:
-    // Attributes shared across all missiles of this type
-    float mSpeed;  // Speed of the missile
-    float mDamage; // Damage caused by the missile
-};
-
-
-/*-----------------------------------------------------------------------------------------
     Missile Entity Class
 -----------------------------------------------------------------------------------------*/
 class Missile : public Entity // entity classes must inherit from Entity
@@ -55,16 +28,11 @@ class Missile : public Entity // entity classes must inherit from Entity
     -----------------------------------------------------------------------------------------*/
 public:
     // Entity constructor parameters must begin with EntityTemplate and ID.
-    Missile(EntityTemplate& entityTemplate, EntityID ID, const Matrix4x4& transform = Matrix4x4::Identity, const std::string& name = "")
-        : Entity(entityTemplate, ID, transform, name),
-        mMissileTemplate(static_cast<MissileTemplate&>(entityTemplate))
-    {
-        auto& missileTemplate = static_cast<MissileTemplate&>(entityTemplate);
-
-        mSpeed = missileTemplate.mSpeed;
-        mDamage = missileTemplate.mDamage;
-    }
-
+    Missile(EntityTemplate& entityTemplate, EntityID ID, const Matrix4x4& transform = Matrix4x4::Identity, 
+        float speed = 45.0f, Vector3 velocity = Vector3(0.0f, 0.0f, 0.0f), EntityID boatID = NO_ID)
+        : Entity(entityTemplate, ID, transform),
+        mSpeed(speed), mVelocity(velocity), mLaunchingBoatID(boatID)
+    {}
 
     /*-----------------------------------------------------------------------------------------
        Update / Render
@@ -87,17 +55,13 @@ public:
        Getters
     -----------------------------------------------------------------------------------------*/
     float GetSpeed() { return mSpeed; }
-    float GetDamage() { return mDamage; }
 
     /*-----------------------------------------------------------------------------------------
        Private data
     -----------------------------------------------------------------------------------------*/
 private:
-    MissileTemplate& mMissileTemplate; // Reference to the missile's template
-    float mSpeed;  // Speed of the missile
-    float mDamage; // Damage caused by the missile
-    Vector3 mVelocity = Vector3(0, 0, 0); // Current velocity of the missile
-
+    float mSpeed = 45.0f;  // Speed of the missile
+    Vector3 mVelocity = Vector3(0.0f, 0.0f, 0.0f); // Current velocity of the missile
     EntityID mLaunchingBoatID = NO_ID;    // ID of the launching boat
 };
 

@@ -79,11 +79,11 @@ public:
 	// Must include importFlags as last parameter regardless
     BoatTemplate(const std::string& type, const std::string& meshFilename,
         float maxSpeed, float acceleration, float turnSpeed, float gunTurnSpeed,
-        float maxHP, float missileDamage, Team team, ImportFlags importFlags = {})
+        float maxHP, int missiles, float missileDamage, Team team, ImportFlags importFlags = {})
         : EntityTemplate(type, meshFilename, importFlags),
         mMaxSpeed(maxSpeed), mAcceleration(acceleration), mTurnSpeed(turnSpeed),
-        mGunTurnSpeed(gunTurnSpeed), mMaxHP(maxHP), mMissileDamage(missileDamage),
-        mTeam(team)
+        mGunTurnSpeed(gunTurnSpeed), mMaxHP(maxHP), mMissiles(missiles),
+        mMissileDamage(missileDamage), mTeam(team)
     {}
 
 
@@ -98,6 +98,7 @@ private:
     float mTurnSpeed;
     float mGunTurnSpeed;
     float mMaxHP;
+    int mMissiles;
     float mMissileDamage;
     Team mTeam;
 };
@@ -131,7 +132,7 @@ public:
         mState = State::Inactive;
         mTimer = 0.0f;
         mMissileDamage = mBoatTemplate.mMissileDamage;
-        mMissilesRemaining = 10;
+        mMissilesRemaining = mBoatTemplate.mMissiles;
         mReloading = false;
     }
 
@@ -243,7 +244,6 @@ private:
     void DestructionBehaviour(float frameTime, bool& shouldDestroy);
     void HandleCollisionAvoidance(float frameTime);
     RandomCrate* FindNearestCrate(float maxDistance);
-    bool IntersectLineAABB(const Vector3& start, const Vector3& end, const AABB& box);
     bool IsLineOfSightBlocked(const Vector3& start, const Vector3& end);
     void AttachShieldMesh();
 

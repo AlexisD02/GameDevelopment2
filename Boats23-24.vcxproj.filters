@@ -110,6 +110,9 @@
     <ClCompile Include="Scene\Shield.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Obstacle.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utility\ColourTypes.h">

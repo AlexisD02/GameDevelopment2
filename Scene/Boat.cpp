@@ -108,7 +108,7 @@ bool Boat::Update(float frameTime)
             break;
 
         case MessageType::Help:
-            if (mState != State::Aim && mState != State::Destroyed) {
+            if (mState == State::Patrol || mState == State::Evade) {
                 HelpMessageData helpData = std::get<HelpMessageData>(message.data);
                 EntityID enemyBoatID = helpData.enemyBoatID;
                 moveToEnemyBoat = gEntityManager->GetEntity<Boat>(enemyBoatID);
@@ -116,7 +116,6 @@ bool Boat::Update(float frameTime)
                 if (moveToEnemyBoat)
                 {
                     mState = State::MoveToAssist;
-                    mTimer = 2.0f;
                 }
             }
             break;
@@ -321,10 +320,8 @@ void Boat::UpdateAim(float frameTime)
             if (timeToTarget > 0.0f)
             {
                 initialVelocity.x = displacement.x / timeToTarget;
+                initialVelocity.y = (displacement.y - 0.5f * -9.81f * timeToTarget * timeToTarget) / timeToTarget;
                 initialVelocity.z = displacement.z / timeToTarget;
-
-                float gravity = -9.81f; // Gravity acceleration
-                initialVelocity.y = (displacement.y - 0.5f * gravity * timeToTarget * timeToTarget) / timeToTarget;
             }
             else
             {
@@ -336,14 +333,8 @@ void Boat::UpdateAim(float frameTime)
             Matrix4x4 initialTransform = Matrix4x4(Transform().Position(), Transform().GetRotation(), 1.0f);
             initialTransform.FaceDirection(normalizedVelocity);
 
-            EntityID missileID = gEntityManager->CreateEntity<Missile>("Missile", initialTransform);
-            Missile* missile = gEntityManager->GetEntity<Missile>(missileID);
-            if (missile)
-            {
-                missile->SetVelocity(initialVelocity);
-                missile->SetLaunchingBoatID(GetID());
-            }
-
+            gEntityManager->CreateEntity<Missile>("Missile", initialTransform, missileSpeed, initialVelocity, GetID());
+ 
             mEvadePoint = ChooseEvadePoint(enemyPos);
             UseMissile();
             mState = State::Evade;
@@ -565,8 +556,8 @@ void Boat::UpdateMoveToAssist(float frameTime)
     // If within engagement range, switch to Aim state
     if (distance <= 120.0f)
     {
-        mState = State::Aim;
         mTimer = 2.0f;
+        mState = State::Aim;
     }
     else
     {
@@ -606,9 +597,8 @@ void Boat::DestructionBehaviour(float frameTime, bool& shouldDestroy)
 // Collision avoidance: adjust heading if another boat is too close.
 void Boat::HandleCollisionAvoidance(float frameTime)
 {
-    static float kSafeBoatDistance = 40.0f;    // If another boat is within 40 units, we steer away
-    static float kThreatDistance = 120.0f;   // If another boat is within 120 units and within certain angle => immediate threat
-    static float kThreatAngleDeg = 50.0f;    // If boat is in front within ±60°, treat as immediate threat
+    static float kSafeBoatDistance = 40.0f; // If another boat is within 40 units, we steer away
+    static float kThreatAngleDeg = 50.0f; // If boat is in front within (+/-)60°, treat as immediate threat
 
     static float kSafeObstacleDistance = 50.0f; // Avoidance radius for obstacles
     static float kThreatSpeedCap = 12.0f; // Speed limit if avoidance required
@@ -617,7 +607,6 @@ void Boat::HandleCollisionAvoidance(float frameTime)
     static float kAvoidWeight = 0.60f; // Weight of avoidance direction
     static float kForwardWeight = 0.40f; // Forward movement weight
     static float kTurnMultiplier = 1.8f; // Boost turn speed when avoiding
-
     static float kDirectionLerpFactor = 0.3f; // Smooth blending factor (30%)
 
     // Get boats and obstacles
@@ -629,7 +618,6 @@ void Boat::HandleCollisionAvoidance(float frameTime)
     myForward.y = 0.0f;
     myForward = Normalise(myForward);
 
-    bool immediateThreatDetected = false;
     Vector3 avoidanceDirection(0.0f, 0.0f, 0.0f);
 
     for (Boat* otherBoat : allBoats)
@@ -637,16 +625,6 @@ void Boat::HandleCollisionAvoidance(float frameTime)
         Vector3 offset = otherBoat->Transform().Position() - myPos;
         float dist = offset.Length();
         if (dist < 0.0001f) continue;
-
-        if (dist < kThreatDistance)
-        {
-            Vector3 offsetNorm = offset / dist;
-            float dotVal = Dot(myForward, offsetNorm);
-            if (dotVal > std::cos(ToRadians(kThreatAngleDeg)))
-            {
-                immediateThreatDetected = true;
-            }
-        }
 
         // Regular Avoidance if boat is within
         if (dist < kSafeBoatDistance)
@@ -687,10 +665,7 @@ void Boat::HandleCollisionAvoidance(float frameTime)
         smoothedDir = Normalise(smoothedDir);
 
         float finalTurnSpeed = mBoatTemplate.mTurnSpeed * kTurnMultiplier;
-        if (immediateThreatDetected)
-        {
-            mSpeed = std::min(mSpeed, kThreatSpeedCap); // Reduce speed for sharp turns
-        }
+        mSpeed = std::min(mSpeed, kThreatSpeedCap); // Reduce speed for sharp turns
 
         FaceDirection(smoothedDir, frameTime, finalTurnSpeed);
     }
@@ -712,76 +687,22 @@ RandomCrate* Boat::FindNearestCrate(float maxDistance)
             nearestCrate = crate;
         }
     }
+
     return nearestCrate;
-}
-
-//------------------------------------------------------------------------------
-// Determines if a line segment (start to end) intersects with an axis-aligned bounding box (AABB).
-// The algorithm uses the Ray-Box intersection algorithm based on the slab method. This method checks 
-// the intersection along each axis separately and determines if the segment overlaps with the box.
-// Reference: www.scratchapixel.com. (n.d.). A Minimal Ray-Tracer: Rendering Simple Shapes (Sphere, Cube, Disk, Plane, etc.).
-// Available at: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection.html
-bool Boat::IntersectLineAABB(const Vector3& start, const Vector3& end, const AABB& box)
-{
-    Vector3 dir = end - start;
-    Vector3 invDir;
-    invDir.x = 1.0f / dir.x;
-    invDir.y = 1.0f / dir.y;
-    invDir.z = 1.0f / dir.z;
-
-    int sign[3];
-    sign[0] = (invDir.x < 0);
-    sign[1] = (invDir.y < 0);
-    sign[2] = (invDir.z < 0);
-
-    float tmin, tmax, tymin, tymax, tzmin, tzmax;
-
-    // X-axis
-    tmin = (box.min.x - start.x) * invDir.x;
-    tmax = (box.max.x - start.x) * invDir.x;
-    if (sign[0])
-        std::swap(tmin, tmax);
-
-    // Y-axis
-    tymin = (box.min.y - start.y) * invDir.y;
-    tymax = (box.max.y - start.y) * invDir.y;
-    if (sign[1])
-        std::swap(tymin, tymax);
-
-    if (tmin > tymax || tymin > tmax)
-        return false;
-
-    tmin = std::max(tmin, tymin);
-    tmax = std::min(tmax, tymax);
-
-    // Z-axis
-    tzmin = (box.min.z - start.z) * invDir.z;
-    tzmax = (box.max.z - start.z) * invDir.z;
-    if (sign[2])
-        std::swap(tzmin, tzmax);
-
-    if (tmin > tzmax || tzmin > tmax)
-        return false;
-
-    tmin = std::max(tmin, tzmin);
-    tmax = std::min(tmax, tzmax);
-
-    // Check if the intersection is within the line segment [0, 1]
-    return tmax >= 0.0f && tmin <= 1.0f;
 }
 
 bool Boat::IsLineOfSightBlocked(const Vector3& start, const Vector3& end)
 {
-    std::vector<Obstacle*> obstacles = gEntityManager->GetAllObstacleEntities();
+    std::vector<Obstacle*> obstacles = gEntityManager->GetAllObstacleEntities(); // Get all obstacles
+
     for (Obstacle* obs : obstacles)
     {
         if (!obs) continue;
-        // If we intersect with any obstacle, the line of sight is blocked
-        if (IntersectLineAABB(start, end, obs->GetAABB()))
-        {
-            return true;
-        }
+
+        // If line from start to end intersects with the obstacle's bounding box, LoS is blocked
+        if (obs->IntersectsLineSegment(start, end)) return true;
     }
+
     return false;
 }
 
@@ -820,6 +741,7 @@ Vector3 Boat::ChooseRandomPointInArea()
 {
     float x = Random(-500.0f, 500.0f);
     float z = Random(-500.0f, 500.0f);
+
     return Vector3(x, -1.5f, z);
 }
 
@@ -923,7 +845,7 @@ void Boat::BroadcastHelpMessage(Boat* enemyEntity)
 
     for (Boat* mate : teammates)
     {
-        if (!mate || mate->GetTeam() != mTeam) continue; // Ensure same team
+        if (!mate || mate->GetTeam() != mTeam) continue;
 
         Vector3 matePos = mate->Transform().Position();
         Vector3 toEnemy = enemyPos - matePos;
@@ -931,7 +853,6 @@ void Boat::BroadcastHelpMessage(Boat* enemyEntity)
 
         if (distanceToEnemy > kHelpDistance) continue;
 
-        // Use the struct instead of raw EntityID
         HelpMessageData helpData{ enemyEntity->GetID() };
         gMessenger->DeliverMessage(GetID(), mate->GetID(), MessageType::Help, helpData);
     }

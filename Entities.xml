@@ -26,13 +26,13 @@
 		<EntityTemplate Type="EntityTemplate" Name="Pillar1" Mesh="Pillar.fbx" />
 
 		<!-- Boat Template (Team A) -->
-		<EntityTemplate Type="BoatTemplate" Name="Blue Tanker" Mesh="Boat1.fbx" MaxSpeed="6.5" Acceleration="1.0" TurnSpeed="0.9" GunTurnSpeed="1.1" MaxHP="100.0" MissileDamage="25.0" Team="TeamA" />
+		<EntityTemplate Type="BoatTemplate" Name="Blue Tanker" Mesh="Boat1.fbx" MaxSpeed="6.5" Acceleration="1.0" TurnSpeed="0.9" GunTurnSpeed="1.1" MaxHP="100.0" Missiles="10" MissileDamage="25.0" Team="TeamA" />
 
 		<!-- Boat Template (Team B) -->
-		<EntityTemplate Type="BoatTemplate" Name="Green Fleeter" Mesh="Boat2.fbx" MaxSpeed="7.0" Acceleration="1.0" TurnSpeed="0.9" GunTurnSpeed="1.2" MaxHP="100.0" MissileDamage="25.0" Team="TeamB" />
+		<EntityTemplate Type="BoatTemplate" Name="Green Fleeter" Mesh="Boat2.fbx" MaxSpeed="7.0" Acceleration="1.0" TurnSpeed="0.9" GunTurnSpeed="1.2" MaxHP="100.0" Missiles="10" MissileDamage="25.0" Team="TeamB" />
 
 		<!-- Boat Template (Team C) -->
-		<EntityTemplate Type="BoatTemplate" Name="Purple Eater" Mesh="Boat3.fbx" MaxSpeed="7.2" Acceleration="1.2" TurnSpeed="0.9" GunTurnSpeed="1.2" MaxHP="90.0" MissileDamage="15.0" Team="TeamC" />
+		<EntityTemplate Type="BoatTemplate" Name="Purple Eater" Mesh="Boat3.fbx" MaxSpeed="7.2" Acceleration="1.2" TurnSpeed="0.9" GunTurnSpeed="1.2" MaxHP="90.0" Missiles="10" MissileDamage="15.0" Team="TeamC" />
 	</EntityTemplates>
 	<!-- End of Entity Types -->
 
@@ -43,7 +43,7 @@
 		<!-- Scenery -->
 		<Entity Type="Entity" Template="Sky">
 			<Transform>
-				<Position X="0.0" Y="0.0" Z="0.0" />
+				<Position X="0.0" Y="0.0" Z="0.0" />	
 				<Rotation X="0.0" Y="0.0" Z="0.0" />
 				<Scale Value="75.0" />
 			</Transform>

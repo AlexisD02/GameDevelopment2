@@ -106,6 +106,7 @@
     <ClCompile Include="Math\Vector2.cpp" />
     <ClCompile Include="Math\Vector3.cpp" />
     <ClCompile Include="Math\Vector4.cpp" />
+    <ClCompile Include="Obstacle.cpp" />
     <ClCompile Include="Render\Assimp.cpp" />
     <ClCompile Include="Render\CBuffer.cpp" />
     <ClCompile Include="Render\DXDevice.cpp" />

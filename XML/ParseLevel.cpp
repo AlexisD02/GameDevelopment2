@@ -120,6 +120,10 @@ bool ParseLevel::ParseEntityTemplates(XMLElement* templatesElem)
             if (attr == nullptr)  return false;
             float missileDamage = attr->FloatValue();
 
+            attr = templateElem->FindAttribute("Missiles");
+            if (attr == nullptr)  return false;
+            int missiles = attr->IntValue();
+
             attr = templateElem->FindAttribute("Team");
             if (attr == nullptr)
                 return false;
@@ -133,7 +137,7 @@ bool ParseLevel::ParseEntityTemplates(XMLElement* templatesElem)
             else if (teamStr == "TeamC")
                 teamEnum = Team::TeamC;
 
-            mEntityManager->CreateEntityTemplate<BoatTemplate>(name, mesh, maxSpeed, acceleration, turnSpeed, gunTurnSpeed, maxHP, missileDamage, teamEnum);
+            mEntityManager->CreateEntityTemplate<BoatTemplate>(name, mesh, maxSpeed, acceleration, turnSpeed, gunTurnSpeed, maxHP, missiles, missileDamage, teamEnum);
         }
         // You can add other template types here as needed.
 
@@ -147,14 +151,11 @@ bool ParseLevel::ParseEntityTemplates(XMLElement* templatesElem)
 // Ordinary entities are parsed in this pass.
 bool ParseLevel::ParseEntitiesElement(XMLElement* entitiesElem)
 {
-    //--------------------
-    // Ordinary entities
-
-    // First, iterate over all <Entity> elements.
+    // Iterate over all <Entity> elements.
     XMLElement* element = entitiesElem->FirstChildElement("Entity");
     while (element != nullptr)
     {
-        // Read the required attributes: "Type" and "Template"
+        // Read the required attributes: "Type", "Template", "Name"
         const XMLAttribute* attr = element->FindAttribute("Type");
         if (attr == nullptr)  return false;
         std::string entityType = attr->Value();
@@ -163,7 +164,6 @@ bool ParseLevel::ParseEntitiesElement(XMLElement* entitiesElem)
         if (attr == nullptr)  return false;
         std::string templateName = attr->Value();
 
-        // (Optional: if you want to use the entity name, you can also read it.)
         std::string entityName;
         attr = element->FindAttribute("Name");
         if (attr != nullptr)
@@ -216,6 +216,7 @@ bool ParseLevel::ParseEntitiesElement(XMLElement* entitiesElem)
             XMLElement* speedElem = element->FirstChildElement("Speed");
             if (speedElem != nullptr)
                 speed = speedElem->FloatAttribute("Value", 0.0f);
+
             mEntityManager->CreateEntity<Boat>(templateName, speed, transform, entityName);
         }
 

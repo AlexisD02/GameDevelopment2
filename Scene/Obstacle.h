@@ -36,6 +36,9 @@ public:
     // Returns the obstacle's axis-aligned bounding box.
     const AABB& GetAABB() const { return mAABB; }
 
+    // Determines if a line segment (start to end) intersects with this obstacle's AABB.
+    bool IntersectsLineSegment(const Vector3& start, const Vector3& end);
+
 private:
     AABB mAABB; // The axis-aligned bounding box for collision or occlusion tests.
     Vector3 mHalfExtents;  // Half-dimensions of the obstacle.

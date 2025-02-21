@@ -76,6 +76,8 @@ private:
     // Chase camera helpers
     void UpdateChaseCameras(float frameTime);
 
+    bool AreBoatsActive();
+
     void DrawGUI();
 
     //--------------------------------------------------------------------------------------

@@ -170,7 +170,6 @@ void Scene::Render()
     vp.TopLeftY = 0;
     DX->Context()->RSSetViewports(1, &vp);
 
-
     // Put data that's constant for the entire frame (e.g. current light information) into the constant buffer
     auto lightPtr = gEntityManager->GetEntity(mLight);
     float light1Intensity = lightPtr->Transform().GetScale().x * lightPtr->Transform().GetScale().x; // Square the light model's scale to get the light intensity
@@ -256,20 +255,20 @@ void Scene::Render()
             float baseOffset = 10.0f;
             float totalRise = 10.0f;
 
-            float timeSincePickup = maxTime - timeLeft;
-            float fraction = timeSincePickup / maxTime;
+            float timeSinceBoatBehaviour = maxTime - timeLeft;
+            float fraction = timeSinceBoatBehaviour / maxTime;
 
             if (fraction > 1.0f) fraction = 1.0f;
 
             float extraOffset = totalRise * fraction;
             float finalOffset = baseOffset + extraOffset;
 
-            // Position the pickup text above the boat
-            Vector3 pickupLabelPos = boatPos + Vector3(0.0f, finalOffset, 0.0f);
+            // Position the an text above the boat for certain time
+            Vector3 boatAddLabelPos = boatPos + Vector3(0.0f, finalOffset, 0.0f);
 
             colour = ColourRGB(0xffcc00);
 
-            DrawTextAtWorldPt(pickupLabelPos, boatPtr->GetBoatText(), activeCamera, true);
+            DrawTextAtWorldPt(boatAddLabelPos, boatPtr->GetBoatText(), activeCamera, true);
         }
     }
 
@@ -294,7 +293,7 @@ void Scene::Render()
     //*******************************
     // Draw ImGUI interface
     //*******************************
-    // You can draw ImGUI elements at any time between the frame preparation code at the top
+    // Draw ImGUI elements at any time between the frame preparation code at the top
     // of this function, and the finalisation code below
     DrawGUI();
 
@@ -409,14 +408,19 @@ void Scene::DrawGUI() {
             static float setHP = mSelectedUIBoat->GetHP();
             ImGui::InputFloat("Set HP", &setHP);
             if (ImGui::Button("Apply HP")) {
-                mSelectedUIBoat->SetHP(setHP);
+                setHP = std::max(0.0f, setHP); // Prevent negative HP
+                if (setHP < mSelectedUIBoat->GetHP()) {
+                    mSelectedUIBoat->SetHP(setHP);
+                }
             }
 
             ImGui::Text("Missiles: %d", mSelectedUIBoat->GetMissilesRemaining());
 
+            // Allow adding or reducing missiles.
             static int setMissiles = mSelectedUIBoat->GetMissilesRemaining();
             ImGui::InputInt("Set Missiles", &setMissiles);
             if (ImGui::Button("Apply Missiles")) {
+                setMissiles = std::max(0, setMissiles); // Prevent negative missiles
                 mSelectedUIBoat->AddMissiles(setMissiles);
             }
 
@@ -716,37 +720,39 @@ void Scene::Update(float frameTime)
         }
     }
 
-    // Check and spawn crates only if the current count is below the limit
-    existingCrates = gEntityManager->GetAllCratesEntities();
-    if (existingCrates.size() < mMaxCrates && mRandomCrateTimer <= 0.0f) {
-        Vector3 spawnPos(Random(-250.0f, 250.0f), -10.0f, Random(-250.0f, 250.0f));
-        Matrix4x4 transform(spawnPos, { 0, 0, 0 }, 1.0f);
+    if (AreBoatsActive()) // Only spawn if boats are active
+    {
+        existingCrates = gEntityManager->GetAllCratesEntities();
+        if (existingCrates.size() < mMaxCrates && mRandomCrateTimer <= 0.0f) {
+            Vector3 spawnPos(Random(-250.0f, 250.0f), -10.0f, Random(-250.0f, 250.0f));
+            Matrix4x4 transform(spawnPos, { 0, 0, 0 }, 1.0f);
 
-        float r = Random(0.0f, 1.0f);
-        CrateType type;
-        if (r < 0.33f)
-            type = CrateType::Missile;
-        else if (r < 0.66f)
-            type = CrateType::Health;
-        else
-            type = CrateType::Shield;
+            float r = Random(0.0f, 1.0f);
+            CrateType type;
+            if (r < 0.33f)
+                type = CrateType::Missile;
+            else if (r < 0.66f)
+                type = CrateType::Health;
+            else
+                type = CrateType::Shield;
 
-        gEntityManager->CreateEntity<RandomCrate>("RandomCrate", transform, type);
+            gEntityManager->CreateEntity<RandomCrate>("RandomCrate", transform, type);
 
-        // Reset the timer for the next crate spawn
-        mRandomCrateTimer = Random(12.0f, 20.0f);
-    }
+            // Reset the timer for the next crate spawn
+            mRandomCrateTimer = Random(12.0f, 20.0f);
+        }
 
-    // Check and spawn mines only if the current count is below the limit
-    existingMines = gEntityManager->GetAllMinesEntities();
-    if (existingMines.size() < mMaxMines && mRandomMineTimer <= 0.0f) {
-        Vector3 spawnPos(Random(-250.0f, 250.0f), -20.0f, Random(-250.0f, 250.0f));
-        Matrix4x4 transform(spawnPos, { 0, 0, 0 }, 1.0f);
+        // Check and spawn mines only if the current count is below the limit
+        existingMines = gEntityManager->GetAllMinesEntities();
+        if (existingMines.size() < mMaxMines && mRandomMineTimer <= 0.0f) {
+            Vector3 spawnPos(Random(-250.0f, 250.0f), -20.0f, Random(-250.0f, 250.0f));
+            Matrix4x4 transform(spawnPos, { 0, 0, 0 }, 1.0f);
 
-        gEntityManager->CreateEntity<SeaMine>("SeaMine", transform);
+            gEntityManager->CreateEntity<SeaMine>("SeaMine", transform);
 
-        // Reset the timer for the next mine spawn
-        mRandomMineTimer = Random(12.0f, 15.0f);
+            // Reset the timer for the next mine spawn
+            mRandomMineTimer = Random(12.0f, 15.0f);
+        }
     }
 
     // Toggle FPS limiting
@@ -807,4 +813,17 @@ void Scene::HandleMousePicking()
         }
 
     }
+}
+
+bool Scene::AreBoatsActive()
+{
+    std::vector<Boat*> boats = gEntityManager->GetAllBoatEntities();
+    for (Boat* boat : boats)
+    {
+        if (boat && boat->GetState() != "Inactive")
+        {
+            return true;
+        }
+    }
+    return false; // All boats are inactive
 }
